@@ -229,5 +229,4 @@ return [
         'Goutte' => Weidner\Goutte\GoutteFacade::class,
         'Telegram'  => Telegram\Bot\Laravel\Facades\Telegram::class
     ],
-
 ];
