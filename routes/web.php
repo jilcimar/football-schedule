@@ -18,3 +18,5 @@ Route::get('/', function () {
 });
 
 Route::get('/filtrar', 'Controller@getDados');
+
+Route::get('/updated', 'Controller@updatedActivity');

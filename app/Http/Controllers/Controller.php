@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Weidner\Goutte\GoutteFacade;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 class Controller extends BaseController
 {
@@ -36,7 +37,18 @@ class Controller extends BaseController
             $dados['canal']= $liga[$i][3];
             return $dados;
         });
-        dd( $dados);
-
+        dd($dados);
     }
+
+    public function updatedActivity()
+    {
+        $activity = Telegram::getUpdates();
+
+        Telegram::sendMessage([
+            'chat_id' => env('TELEGRAM_CHANNEL_ID', '375323134'),
+            'parse_mode' => 'HTML',
+            'text' => 'Olá, bem vindo ao Bot Futebol na TV, todos os dias às 8h você irá receber a
+        lista de jogos do dia com a informação de onde será transmitido.'
+        ]);
+}
 }
