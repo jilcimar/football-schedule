@@ -38,7 +38,6 @@ return [
             'certificate_path'    => env('TELEGRAM_CERTIFICATE_PATH', 'YOUR-CERTIFICATE-PATH'),
             'webhook_url'         => env('TELEGRAM_WEBHOOK_URL', '127.0.0.1'),
             'commands'            => [
-               \App\Console\Commands\TelegramCron::class
             ],
         ],
 
