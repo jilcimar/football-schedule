@@ -82,10 +82,20 @@ class TelegramCron extends Command
 
     public function sendMessage ($text)
     {
-        Telegram::sendMessage([
-            'chat_id' => env('TELEGRAM_CHANNEL_ID', '375323134'),
-            'parse_mode' => 'HTML',
-            'text' => $text
-        ]);
+        $activity = Telegram::getUpdates();
+        $chatsIds = [];
+        foreach ($activity as $a) {
+            if($a->message and $a->message->from->id and !in_array( $a->message->from->id, $chatsIds)) {
+                array_push($chatsIds, $a->message->from->id);
+            }
+        }
+
+        foreach ($chatsIds as $id) {
+            Telegram::sendMessage([
+                'chat_id' => $id,
+                'parse_mode' => 'HTML',
+                'text' => $text
+            ]);
+        }
     }
 }

@@ -43,12 +43,21 @@ class Controller extends BaseController
     public function updatedActivity()
     {
         $activity = Telegram::getUpdates();
+        $chatsIds = [];
+        foreach ($activity as $a) {
+            if($a->message and $a->message->from->id and !in_array( $a->message->from->id, $chatsIds)) {
+                array_push($chatsIds, $a->message->from->id);
+            }
+        }
 
-        Telegram::sendMessage([
-            'chat_id' => env('TELEGRAM_CHANNEL_ID', '375323134'),
-            'parse_mode' => 'HTML',
-            'text' => 'Olá, bem vindo ao Bot Futebol na TV, todos os dias às 8h você irá receber a
-        lista de jogos do dia com a informação de onde será transmitido.'
-        ]);
+        return \GuzzleHttp\json_encode($chatsIds);
+
+        return \GuzzleHttp\json_encode($activity);
+
+//        Telegram::sendMessage([
+//            'chat_id' => env('TELEGRAM_CHANNEL_ID', '375323134'),
+//            'parse_mode' => 'HTML',
+//            'text' => 'Olá, bem vindo ao Bot Futebol na TV, todos os dias às 8h você irá receber a lista de jogos do dia com a informação de onde será transmitido.'
+//        ]);
 }
 }
