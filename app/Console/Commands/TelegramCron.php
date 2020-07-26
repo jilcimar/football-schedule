@@ -66,14 +66,16 @@ class TelegramCron extends Command
             });
 
         $texto = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE"."\n";
-
+        $limit = 15;
         foreach ($dados as $dado) {
-
-            $texto = $texto ."\n \xF0\x9F\x8F\x86 : " . $dado['liga'] . "\n"
-                . " \xE2\x9A\xBD : ". $dado['time1'] . " x ". $dado['time2'] ."\n"
-                . " \xF0\x9F\x95\xA7 : ". $dado['hora']."\n"
-                . " \xF0\x9F\x93\xBA : " . $dado['canal']. "\n"
-                ."-------------------------------------------------------";
+            if($limit>=0) {
+                $texto = $texto ."\n \xF0\x9F\x8F\x86 : " . $dado['liga'] . "\n"
+                    . " \xE2\x9A\xBD : ". $dado['time1'] . " x ". $dado['time2'] ."\n"
+                    . " \xF0\x9F\x95\xA7 : ". $dado['hora']."\n"
+                    . " \xF0\x9F\x93\xBA : " . $dado['canal']. "\n"
+                    ."-------------------------------------------------------";
+            }
+            $limit-=1;
         }
 
         $this->sendMessage($texto);
