@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subscriber;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -12,7 +13,6 @@ use Telegram\Bot\Laravel\Facades\Telegram;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
 
     public function getDados() {
         $crawler = GoutteFacade::request('GET',
@@ -37,27 +37,28 @@ class Controller extends BaseController
             $dados['canal']= $liga[$i][3];
             return $dados;
         });
-        dd($dados);
+        return \GuzzleHttp\json_encode($dados);
     }
 
     public function updatedActivity()
     {
         $activity = Telegram::getUpdates();
-        $chatsIds = [];
         foreach ($activity as $a) {
-            if($a->message and $a->message->from->id and !in_array( $a->message->from->id, $chatsIds)) {
-                array_push($chatsIds, $a->message->from->id);
+            if($a->message and $a->message->from->id and $a->message->from->first_name) {
+                Subscriber::updateOrCreate(
+                    [
+                        'chat_id' => $a->message->from->id ,
+                    ],
+                    [
+                        'chat_id' => $a->message->from->id,
+                        'username' =>$a->message->from->username,
+                        'first_name' =>$a->message->from->first_name,
+                        'language_code' => $a->message->from->language_code,
+                    ]
+                );
             }
         }
 
-        return \GuzzleHttp\json_encode($chatsIds);
-
         return \GuzzleHttp\json_encode($activity);
-
-//        Telegram::sendMessage([
-//            'chat_id' => env('TELEGRAM_CHANNEL_ID', '375323134'),
-//            'parse_mode' => 'HTML',
-//            'text' => 'Olá, bem vindo ao Bot Futebol na TV, todos os dias às 8h você irá receber a lista de jogos do dia com a informação de onde será transmitido.'
-//        ]);
-}
+    }
 }

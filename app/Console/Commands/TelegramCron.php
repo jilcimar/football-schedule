@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Controller;
+use App\Models\Subscriber;
 use Illuminate\Console\Command;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Weidner\Goutte\GoutteFacade;
@@ -85,16 +86,28 @@ class TelegramCron extends Command
     public function sendMessage ($text)
     {
         $activity = Telegram::getUpdates();
-        $chatsIds = [];
+
         foreach ($activity as $a) {
-            if($a->message and $a->message->from->id and !in_array( $a->message->from->id, $chatsIds)) {
-                array_push($chatsIds, $a->message->from->id);
+            if($a->message and $a->message->from->id and $a->message->from->first_name) {
+                Subscriber::updateOrCreate(
+                    [
+                        'chat_id' => $a->message->from->id ,
+                    ],
+                    [
+                        'chat_id' => $a->message->from->id,
+                        'username' =>$a->message->from->username,
+                        'first_name' =>$a->message->from->first_name,
+                        'language_code' => $a->message->from->language_code,
+                    ]
+                );
             }
         }
 
-        foreach ($chatsIds as $id) {
+        $subscribers = Subscriber::all();
+
+        foreach ($subscribers as $subscriber) {
             Telegram::sendMessage([
-                'chat_id' => $id,
+                'chat_id' => $subscriber->chat_id,
                 'parse_mode' => 'HTML',
                 'text' => $text
             ]);
