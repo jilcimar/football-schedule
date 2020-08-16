@@ -41,7 +41,7 @@ class TelegramCron extends Command
      */
     public function handle()
     {
-        \Log::info("Cron funcionando!");
+        \Log::info("Cron executando!");
 
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
@@ -66,20 +66,33 @@ class TelegramCron extends Command
                 return $dados;
             });
 
-        $texto = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE"."\n";
-        $limit = 15;
-        foreach ($dados as $dado) {
-            if($limit>=0) {
-                $texto = $texto ."\n \xF0\x9F\x8F\x86 : " . $dado['liga'] . "\n"
-                    . " \xE2\x9A\xBD : ". $dado['time1'] . " x ". $dado['time2'] ."\n"
-                    . " \xF0\x9F\x95\xA7 : ". $dado['hora']."\n"
-                    . " \xF0\x9F\x93\xBA : " . $dado['canal']. "\n"
-                    ."-------------------------------------------------------";
-            }
-            $limit-=1;
+        //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
+        $jogos = array_chunk($dados, 11);
+
+        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE"."\n";
+
+        foreach ($jogos[0] as $jogo) {
+            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
+                . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
+                . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                ."-------------------------------------------------------";
         }
 
-        $this->sendMessage($texto);
+        $this->sendMessage($firstPart);
+
+        if(isset($jogos[1])) {
+            $secondPart ='';
+            foreach ($jogos[1] as $jogo) {
+                $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
+                    . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
+                    . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                    . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                    ."-------------------------------------------------------";
+            }
+            $this->sendMessage($secondPart);
+        }
+
         $this->info('Executado!');
     }
 
