@@ -67,7 +67,7 @@ class TelegramCron extends Command
             });
 
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
-        $jogos = array_chunk($dados, 11);
+        $jogos = array_chunk($dados, 15);
 
         $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE"."\n";
 

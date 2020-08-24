@@ -43,6 +43,7 @@ class Controller extends BaseController
     public function updatedActivity()
     {
         $activity = Telegram::getUpdates();
+        dd($activity);
         foreach ($activity as $a) {
             if($a->message and $a->message->from->id and $a->message->from->first_name) {
                 Subscriber::updateOrCreate(
