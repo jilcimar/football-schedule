@@ -42,8 +42,18 @@ class Controller extends BaseController
 
     public function updatedActivity()
     {
+
+//        Telegram::sendMessage([
+//            'chat_id' => '-473315704',
+//            'parse_mode' => 'HTML',
+//            'text' => 'oi teste grupo'
+//        ]);
+//
+//        return 'foi';
+
+
         $activity = Telegram::getUpdates();
-        dd($activity);
+
         foreach ($activity as $a) {
             if($a->message and $a->message->from->id and $a->message->from->first_name) {
                 Subscriber::updateOrCreate(
@@ -55,6 +65,20 @@ class Controller extends BaseController
                         'username' =>$a->message->from->username,
                         'first_name' =>$a->message->from->first_name,
                         'language_code' => $a->message->from->language_code,
+                    ]
+                );
+            }
+
+            if ($a->message and $a->message->chat->title and $a->message->chat->id and $a->message->chat->type == "group") {
+                Subscriber::updateOrCreate(
+                    [
+                        'chat_id' => $a->message->chat->id ,
+                    ],
+                    [
+                        'chat_id' => $a->message->chat->id ,
+                        'username' => $a->message->chat->title,
+                        'first_name' => $a->message->chat->title,
+                        'group' => true,
                     ]
                 );
             }

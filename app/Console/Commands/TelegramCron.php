@@ -114,6 +114,20 @@ class TelegramCron extends Command
                     ]
                 );
             }
+
+            if ($a->message and $a->message->chat->title and $a->message->chat->id and $a->message->chat->type == "group") {
+                Subscriber::updateOrCreate(
+                    [
+                        'chat_id' => $a->message->chat->id ,
+                    ],
+                    [
+                        'chat_id' => $a->message->chat->id ,
+                        'username' => $a->message->chat->title,
+                        'first_name' => $a->message->chat->title,
+                        'group' => true,
+                    ]
+                );
+            }
         }
 
         $subscribers = Subscriber::all();
