@@ -13,10 +13,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Auth::routes();
+
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('home');
 });
 
-Route::get('/filtrar', 'Controller@getDados');
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/home', 'HomeController@index')->name('home');
+//    Route::resource('users', 'UserController');
 
-Route::get('/updated', 'Controller@updatedActivity');
+    /*
+     |--------------------------------------------------------------------------
+     | Teste Routes
+     |--------------------------------------------------------------------------
+    */
+
+    Route::get('/filtrar', 'Controller@getDados');
+    Route::get('/updated', 'Controller@updatedActivity');
+});

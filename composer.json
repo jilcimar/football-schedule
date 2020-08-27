@@ -13,8 +13,10 @@
         "fruitcake/laravel-cors": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "irazasyed/telegram-bot-sdk": "^3.0",
+        "jeroennoten/laravel-adminlte": "^3.4",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
+        "laravel/ui": "^2.2",
         "weidner/goutte": "^1.5"
     },
     "require-dev": {
