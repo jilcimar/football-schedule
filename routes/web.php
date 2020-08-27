@@ -19,9 +19,13 @@ Route::get('/', function () {
     return redirect('home');
 });
 
+Route::get('/register', function () {
+    return redirect('home');
+});
+
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', 'HomeController@index')->name('home');
-//    Route::resource('users', 'UserController');
+    Route::resource('subscribers', 'SubscriberController');
 
     /*
      |--------------------------------------------------------------------------

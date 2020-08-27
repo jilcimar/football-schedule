@@ -234,7 +234,7 @@ return [
         ['header' => 'main_navigation'],
         [
             'text' => 'Lista de inscrições',
-            'url'  => 'users',
+            'url'  => 'subscribers',
             'icon' => 'fas fa-fw fa-list-ul',
         ],
         [
