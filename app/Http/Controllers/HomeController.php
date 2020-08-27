@@ -39,8 +39,7 @@ class HomeController extends Controller
             });
 
         foreach ($groupByMonth as $key=> $data) {
-            $date = gregoriantojd($key,1,2020);
-            $labelMeses[] = jdmonthname($date,0);
+            $labelMeses[] = date("F", mktime(null, null, null, $key, 1));
             $dadosMeses[] = count($data);
         }
         return view('home', compact('usersActive','usersAll', 'labelMeses','dadosMeses'));
