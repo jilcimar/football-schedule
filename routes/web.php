@@ -26,6 +26,8 @@ Route::get('/register', function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/home', 'HomeController@index')->name('home');
     Route::resource('subscribers', 'SubscriberController');
+    Route::get('/subscribers-warning', 'SubscriberController@createWarning');
+    Route::post('/subscribers-warning', 'SubscriberController@sendWarning')->name('sendWarning');
 
     /*
      |--------------------------------------------------------------------------

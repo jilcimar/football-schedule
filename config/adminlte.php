@@ -239,7 +239,7 @@ return [
         ],
         [
             'text' => 'Disparar aviso',
-            'url'  => 'chat',
+            'url'  => 'subscribers-warning',
             'icon' => 'fas fa-fw fa-bullhorn',
         ],
     ],
