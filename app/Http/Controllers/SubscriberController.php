@@ -40,39 +40,40 @@ class SubscriberController extends Controller
     {
         $text = "\xF0\x9F\x9A\xA7	ATUALIZAÇÃO! \xF0\x9F\x9A\xA7 "."\n \n".$request->text;
 
-        //TODOS OS USUÁRIOS
-        if ($request->type == "0") {
+        if ($request->type == Subscriber::TODOS_USUARIOS) {
             $subscribers = Subscriber::all();
-            foreach ($subscribers as $subscriber) {
-                try {
-                    $chatId = env('MODE_TEST')?'375323134':$subscriber->chat_id;
-
-                    Telegram::sendMessage([
-                        'chat_id' => $chatId,
-                        'parse_mode' => 'HTML',
-                        'text' => $text
-                    ]);
-                } catch (\Exception $exception) {
-                    $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
-                    $subscriberBlock->delete();
-                    \Log::info("Erro CHAT: ". $subscriber->chat_id);
+            if(env('MODE_TEST')) {
+                Telegram::sendMessage([
+                    'chat_id' => env('CHAT_TEST','375323134'),
+                    'parse_mode' => 'HTML',
+                    'text' => $text
+                ]);
+            } else {
+                foreach ($subscribers as $subscriber) {
+                    try {
+                        Telegram::sendMessage([
+                            'chat_id' => $subscriber->chat_id,
+                            'parse_mode' => 'HTML',
+                            'text' => $text
+                        ]);
+                    } catch (\Exception $exception) {
+                        $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
+                        $subscriberBlock->delete();
+                        \Log::info("Erro CHAT: ". $subscriber->chat_id);
+                    }
                 }
             }
+
             return redirect()->back()->with('success', 'Aviso enviado!');
         }
 
-        $chatId = env('MODE_TEST')?'375323134':$request->type;
+        $chatId = env('MODE_TEST')?env('CHAT_TEST','375323134'):$request->type;
         Telegram::sendMessage([
             'chat_id' => $chatId,
             'parse_mode' => 'HTML',
             'text' => $text
         ]);
 
-
-
-        //375323134
-
         return redirect()->back()->with('success', 'Aviso enviado!');
     }
-
 }

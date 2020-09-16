@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subscriber extends Model
 {
+    const TODOS_USUARIOS = 0;
     protected $table ='subscribers';
 
     protected $fillable = [
