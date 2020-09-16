@@ -136,7 +136,7 @@ class TelegramCron extends Command
         if(env('MODE_TEST'))
         {
             Telegram::sendMessage([
-                'chat_id' => '375323134',
+                'chat_id' => env('CHAT_TEST','375323134'),
                 'parse_mode' => 'HTML',
                 'text' => $text
             ]);
