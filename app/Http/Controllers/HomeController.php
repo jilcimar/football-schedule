@@ -27,7 +27,6 @@ class HomeController extends Controller
     public function index()
     {
         $usersActive = Subscriber::all()->count();
-        $usersAll = count(Telegram::getUpdates());
 
         $labelMeses = [];
         $dadosMeses = [];
@@ -42,6 +41,6 @@ class HomeController extends Controller
             $labelMeses[] = date("F", mktime(null, null, null, $key, 1));
             $dadosMeses[] = count($data);
         }
-        return view('home', compact('usersActive','usersAll', 'labelMeses','dadosMeses'));
+        return view('home', compact('usersActive', 'labelMeses','dadosMeses'));
     }
 }
