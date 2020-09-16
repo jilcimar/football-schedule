@@ -45,8 +45,10 @@ class SubscriberController extends Controller
             $subscribers = Subscriber::all();
             foreach ($subscribers as $subscriber) {
                 try {
+                    $chatId = env('MODE_TEST')?'375323134':$subscriber->chat_id;
+
                     Telegram::sendMessage([
-                        'chat_id' => $subscriber->chat_id,
+                        'chat_id' => $chatId,
                         'parse_mode' => 'HTML',
                         'text' => $text
                     ]);
@@ -59,11 +61,16 @@ class SubscriberController extends Controller
             return redirect()->back()->with('success', 'Aviso enviado!');
         }
 
+        $chatId = env('MODE_TEST')?'375323134':$request->type;
         Telegram::sendMessage([
-            'chat_id' => $request->type,
+            'chat_id' => $chatId,
             'parse_mode' => 'HTML',
             'text' => $text
         ]);
+
+
+
+        //375323134
 
         return redirect()->back()->with('success', 'Aviso enviado!');
     }

@@ -132,17 +132,29 @@ class TelegramCron extends Command
 
         $subscribers = Subscriber::all();
 
-        foreach ($subscribers as $subscriber) {
-            try {
-                Telegram::sendMessage([
-                    'chat_id' => $subscriber->chat_id,
-                    'parse_mode' => 'HTML',
-                    'text' => $text
-                ]);
-            } catch (\Exception $exception) {
-                $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
-                $subscriberBlock->delete();
-                \Log::info("Erro CHAT: ". $subscriber->chat_id);
+
+        if(env('MODE_TEST'))
+        {
+            Telegram::sendMessage([
+                'chat_id' => '375323134',
+                'parse_mode' => 'HTML',
+                'text' => $text
+            ]);
+        }
+        else
+        {
+            foreach ($subscribers as $subscriber) {
+                try {
+                    Telegram::sendMessage([
+                        'chat_id' => $subscriber->chat_id,
+                        'parse_mode' => 'HTML',
+                        'text' => $text
+                    ]);
+                } catch (\Exception $exception) {
+                    $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
+                    $subscriberBlock->delete();
+                    \Log::info("Erro CHAT: ". $subscriber->chat_id);
+                }
             }
         }
     }
