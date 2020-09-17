@@ -14,7 +14,8 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    public function getDados() {
+    public function getDados()
+    {
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
@@ -37,21 +38,12 @@ class Controller extends BaseController
             $dados['canal']= $liga[$i][3];
             return $dados;
         });
+
         return \GuzzleHttp\json_encode($dados);
     }
 
     public function updatedActivity()
     {
-
-//        Telegram::sendMessage([
-//            'chat_id' => '-473315704',
-//            'parse_mode' => 'HTML',
-//            'text' => 'oi teste grupo'
-//        ]);
-//
-//        return 'foi';
-
-
         $activity = Telegram::getUpdates();
 
         foreach ($activity as $a) {

@@ -81,6 +81,7 @@ class TelegramCron extends Command
 
         $this->sendMessage($firstPart);
 
+        //2 Mensagem
         if(isset($jogos[1])) {
             $secondPart ='';
             foreach ($jogos[1] as $jogo) {
@@ -91,6 +92,19 @@ class TelegramCron extends Command
                     ."-------------------------------------------------------";
             }
             $this->sendMessage($secondPart);
+        }
+
+        //3 Mensagem
+        if(isset($jogos[2])) {
+            $thirdPart ='';
+            foreach ($jogos[2] as $jogo) {
+                $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
+                    . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
+                    . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                    . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                    ."-------------------------------------------------------";
+            }
+            $this->sendMessage($thirdPart);
         }
 
         $this->info('Executado!');

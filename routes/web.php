@@ -37,4 +37,5 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('/filtrar', 'Controller@getDados');
     Route::get('/updated', 'Controller@updatedActivity');
+
 });
