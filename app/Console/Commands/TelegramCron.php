@@ -114,7 +114,11 @@ class TelegramCron extends Command
     {
         $activity = Telegram::getUpdates();
 
+        //ATUALIZAÇÃO DA TABELA DE ISNCRITOS COM BASE NAS ULTIMAS INTERAÇÕES
         foreach ($activity as $a) {
+
+            //USUÁRIO - CRIANDO OU SALVADO
+
             if($a->message and $a->message->from->id and $a->message->from->first_name) {
                 Subscriber::updateOrCreate(
                     [
@@ -128,6 +132,8 @@ class TelegramCron extends Command
                     ]
                 );
             }
+
+            //GRUPO
 
             if ($a->message and $a->message->chat->title and $a->message->chat->id and $a->message->chat->type == "group") {
                 Subscriber::updateOrCreate(
