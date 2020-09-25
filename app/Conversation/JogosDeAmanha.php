@@ -5,7 +5,7 @@ namespace App\Conversation;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use Weidner\Goutte\GoutteFacade;
 
-class JogosDeHoje extends Conversation
+class JogosDeAmanha extends Conversation
 {
     public function run()
     {
@@ -18,7 +18,7 @@ class JogosDeHoje extends Conversation
             'https://www.futebolnatv.com.br/');
 
         $dados = $crawler->filter('.table-bordered')
-            ->eq(0)
+            ->eq(1)
             ->filter('tr[class="box"]')
             ->each(function ($tr, $i){
                 //Pegando os campos específicos
@@ -96,7 +96,8 @@ class JogosDeHoje extends Conversation
 
         }
 
-        $this->say("\xF0\x9F\x91\x89  /jogosdehoje - Para ver a lista de jogos do dia");
+        $this->say("\xF0\x9F\x91\x89  /jogosdehoje - Para ver a lista de jogos do dia\n".
+            "\xF0\x9F\x91\x89  /jogosamanha - Para ver a lista de jogos de amanhã");
 
         return true;
     }

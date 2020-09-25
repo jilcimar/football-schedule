@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Conversation\JogosDeAmanha;
 use App\Conversation\JogosDeHoje;
 use App\Conversation\StartConversation;
 use BotMan\BotMan\BotMan;
@@ -43,6 +44,10 @@ class BotManController extends Controller
 
         $this->bot->hears('/jogosdehoje', function (BotMan $bot) {
             $bot->startConversation(new JogosDeHoje);
+        });
+
+        $this->bot->hears('/jogosamanha', function (BotMan $bot) {
+            $bot->startConversation(new JogosDeAmanha);
         });
 
         $this->bot->listen();
