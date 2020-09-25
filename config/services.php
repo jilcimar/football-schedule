@@ -30,4 +30,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'botman' => [
+        'hipchat_urls' => [
+            'https://289ffd97c4bf.ngrok.io/botman',
+            'https://289ffd97c4bf.ngrok.io/botman',
+        ],
+        'telegram_token' => '1253599841:AAGAkEoAaVrGfExEAOaVmU-p0XpZM0kRGoc',
+    ],
+
 ];

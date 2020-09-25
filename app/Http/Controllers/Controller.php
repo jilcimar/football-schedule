@@ -42,40 +42,4 @@ class Controller extends BaseController
         return \GuzzleHttp\json_encode($dados);
     }
 
-    public function updatedActivity()
-    {
-        $activity = Telegram::getUpdates();
-
-        foreach ($activity as $a) {
-            if($a->message and $a->message->from->id and $a->message->from->first_name) {
-                Subscriber::updateOrCreate(
-                    [
-                        'chat_id' => $a->message->from->id ,
-                    ],
-                    [
-                        'chat_id' => $a->message->from->id,
-                        'username' =>$a->message->from->username,
-                        'first_name' =>$a->message->from->first_name,
-                        'language_code' => $a->message->from->language_code,
-                    ]
-                );
-            }
-
-            if ($a->message and $a->message->chat->title and $a->message->chat->id and $a->message->chat->type == "group") {
-                Subscriber::updateOrCreate(
-                    [
-                        'chat_id' => $a->message->chat->id ,
-                    ],
-                    [
-                        'chat_id' => $a->message->chat->id ,
-                        'username' => $a->message->chat->title,
-                        'first_name' => $a->message->chat->title,
-                        'group' => true,
-                    ]
-                );
-            }
-        }
-
-        return \GuzzleHttp\json_encode($activity);
-    }
 }

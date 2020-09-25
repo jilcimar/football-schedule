@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::match(['get', 'post'], '/botman', 'BotManController@handle');
+
 Route::get('/', function () {
     return redirect('home');
 });
@@ -34,8 +36,5 @@ Route::group(['middleware' => ['auth']], function () {
      | Teste Routes
      |--------------------------------------------------------------------------
     */
-
     Route::get('/filtrar', 'Controller@getDados');
-    Route::get('/updated', 'Controller@updatedActivity');
-
 });

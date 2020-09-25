@@ -1,48 +1,19 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Conversation;
 
-use App\Http\Controllers\Controller;
-use App\Models\Subscriber;
-use Illuminate\Console\Command;
-use Telegram\Bot\Laravel\Facades\Telegram;
+use BotMan\BotMan\Messages\Conversations\Conversation;
 use Weidner\Goutte\GoutteFacade;
 
-class TelegramCron extends Command
+class JogosDeHoje extends Conversation
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'demo:cron';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Envio de mensagens para o bot';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function run()
     {
-        parent::__construct();
+        $this->initial();
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function initial()
     {
-        \Log::info("Cron executando!");
-
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
@@ -79,7 +50,7 @@ class TelegramCron extends Command
                 ."-------------------------------------------------------";
         }
 
-        $this->sendMessage($firstPart);
+        $this->say($firstPart);
 
         //2 Mensagem
         if(isset($jogos[1])) {
@@ -91,7 +62,9 @@ class TelegramCron extends Command
                     . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
                     ."-------------------------------------------------------";
             }
-            $this->sendMessage($secondPart);
+
+            $this->say($secondPart);
+
         }
 
         //3 Mensagem
@@ -104,39 +77,13 @@ class TelegramCron extends Command
                     . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
                     ."-------------------------------------------------------";
             }
-            $this->sendMessage($thirdPart);
+
+            $this->say($thirdPart);
+
         }
 
-        $this->info('Executado!');
-    }
+        $this->say("\xF0\x9F\x91\x89  /jogosdehoje - Para ver a lista de jogos do dia");
 
-    public function sendMessage ($text)
-    {
-        $subscribers = Subscriber::all();
-
-        if(env('MODE_TEST'))
-        {
-            Telegram::sendMessage([
-                'chat_id' => env('CHAT_TEST','375323134'),
-                'parse_mode' => 'HTML',
-                'text' => $text
-            ]);
-        }
-        else
-        {
-            foreach ($subscribers as $subscriber) {
-                try {
-                    Telegram::sendMessage([
-                        'chat_id' => $subscriber->chat_id,
-                        'parse_mode' => 'HTML',
-                        'text' => $text
-                    ]);
-                } catch (\Exception $exception) {
-                    $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
-                    $subscriberBlock->delete();
-                    \Log::info("Erro CHAT: ". $subscriber->chat_id);
-                }
-            }
-        }
+        return true;
     }
 }
