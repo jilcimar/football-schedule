@@ -96,7 +96,8 @@ class JogosDeHoje extends Conversation
 
         }
 
-        $this->say("\xF0\x9F\x91\x89  /jogosdehoje - Para ver a lista de jogos do dia");
+        $this->say("\xF0\x9F\x91\x89  /jogosdehoje - Lista de jogos do dia\n".
+            "\xF0\x9F\x91\x89  /jogosamanha - Lista de jogos de amanhã");
 
         return true;
     }
