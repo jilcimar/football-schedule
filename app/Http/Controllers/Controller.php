@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subscriber;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -71,8 +72,6 @@ class Controller extends BaseController
                     return $dados;
                 }
             });
-
-        $dadosAmanha = array_filter($dadosAmanha);
 
         return \GuzzleHttp\json_encode(['JOGOS DE AMANHA'=> $dadosAmanha]);
     }

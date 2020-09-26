@@ -3,6 +3,7 @@
 namespace App\Conversation;
 
 use BotMan\BotMan\Messages\Conversations\Conversation;
+use Carbon\Carbon;
 use Weidner\Goutte\GoutteFacade;
 
 class JogosDeAmanha extends Conversation
@@ -54,7 +55,9 @@ class JogosDeAmanha extends Conversation
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
         $jogos = array_chunk($dados, 15);
 
-        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE"."\n";
+        $dateAmanha =  Carbon::now()->addDays(1)->format('d/m/Y');
+
+        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE AMANHÃ ".$dateAmanha."\n";
 
         foreach ($jogos[0] as $jogo) {
             $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
