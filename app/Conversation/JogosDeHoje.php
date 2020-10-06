@@ -50,6 +50,10 @@ class JogosDeHoje extends Conversation
                 }
             });
 
+        if(count($dados) == 0) {
+            $this->say('Sem jogos para hoje');
+        }
+
         $dados =  array_filter($dados);
 
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
