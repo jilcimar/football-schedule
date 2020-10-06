@@ -54,9 +54,9 @@ class JogosDeAmanha extends Conversation
 
         $dateAmanha =  Carbon::now()->addDays(1)->format('d/m/Y');
 
-        if(count($dados) == 0) {
-            $this->say('Sem jogos para amanhã '. $dateAmanha);
-        }
+//        if(count($dados) == 0) {
+//            $this->say('Sem jogos para amanhã '. $dateAmanha);
+//        }
 
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
         $jogos = array_chunk($dados, 15);
