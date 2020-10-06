@@ -50,16 +50,19 @@ class JogosDeHoje extends Conversation
                 }
             });
 
-        if(count($dados) == 0) {
-            $this->say('Sem jogos para hoje');
-        }
 
         $dados =  array_filter($dados);
+
+        $date = Carbon::now()->format('d/m/Y');
+
+
+        if(count($dados) == 0) {
+            $this->say('Sem jogos para hoje '.$date);
+        }
 
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
         $jogos = array_chunk($dados, 15);
 
-        $date = Carbon::now()->format('d/m/Y');
 
         $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
 
