@@ -107,7 +107,7 @@ class TelegramCron extends Command
             $this->sendMessage($thirdPart);
         }
 
-        $this->info('Executado!');
+        $this->sendMessage("\xF0\x9F\x91\x89  /jogosamanha - Lista de jogos de amanhã");
     }
 
     public function sendMessage ($text)
