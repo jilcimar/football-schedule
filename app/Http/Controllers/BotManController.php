@@ -101,16 +101,6 @@ class BotManController extends Controller
             }
         });
 
-        //COMANDOS EM GRUPOS
-
-        $this->bot->hears('/jogosamanha@futebolnatv_bot', function (BotMan $bot) {
-            $bot->startConversation(new JogosDeAmanha);
-        });
-
-        $this->bot->hears('/jogosdehoje@futebolnatv_bot', function (BotMan $bot) {
-            $bot->startConversation(new JogosDeHoje);
-        });
-
         $this->bot->listen();
     }
 }
