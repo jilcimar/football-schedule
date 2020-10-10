@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Http\Controllers\Controller;
 use App\Models\Subscriber;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Weidner\Goutte\GoutteFacade;
@@ -57,19 +58,38 @@ class TelegramCron extends Command
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-
-                $dados['liga']= $liga[$i][0];
-                $dados['time1']= preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                $dados['time2']= preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                $dados['hora']= $horario[$i][0];
-                $dados['canal']= $liga[$i][3];
-                return $dados;
+                //Eliminando os Campeonatos
+                if( strpos($liga[$i][0], 'Russo') == false
+                    and strpos($liga[$i][0], 'Bielorrusso') == false
+                    and strpos($liga[$i][0], 'Série B') == false
+                    and strpos($liga[$i][0], 'Série C') == false
+                    and strpos($liga[$i][0], 'Série D') == false
+                    and strpos($liga[$i][0], 'Sub-20') == false
+                    and strpos($liga[$i][0], 'A3') == false
+                    and strpos($liga[$i][0], '2ª') == false
+                    and strpos($liga[$i][0], 'MX') == false
+                    and strpos($liga[$i][0], 'Feminino') == false ) {
+                    $dados['liga'] = $liga[$i][0];
+                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
+                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
+                    $dados['hora'] = $horario[$i][0];
+                    $dados['canal'] = $liga[$i][3];
+                    return $dados;
+                }
             });
+
+        $dados =  array_filter($dados);
+
+        $date = Carbon::now()->format('d/m/Y');
+
+//        if(count($dados) == 0) {
+//            $this->say('Sem jogos para hoje '.$date);
+//        }
 
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
         $jogos = array_chunk($dados, 15);
 
-        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE"."\n";
+        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
 
         foreach ($jogos[0] as $jogo) {
             $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
