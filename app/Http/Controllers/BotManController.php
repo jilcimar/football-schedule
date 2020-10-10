@@ -80,6 +80,8 @@ class BotManController extends Controller
             }
         });
 
+
+
         $this->bot->hears('/jogosamanha', function (BotMan $bot) {
             try {
                 $user = $this->bot->getUser();
@@ -97,6 +99,16 @@ class BotManController extends Controller
             } catch (\Exception $e) {
                 //
             }
+        });
+
+        //COMANDOS EM GRUPOS
+
+        $this->bot->hears('/jogosamanha@futebolnatv_bot', function (BotMan $bot) {
+            $bot->startConversation(new JogosDeAmanha);
+        });
+
+        $this->bot->hears('/jogosdehoje@futebolnatv_bot', function (BotMan $bot) {
+            $bot->startConversation(new JogosDeHoje);
         });
 
         $this->bot->listen();
