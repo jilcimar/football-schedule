@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Conversation\JogosDeAmanha;
 use App\Conversation\JogosDeHoje;
 use App\Conversation\StartConversation;
+use App\Conversation\Tabela;
 use App\Models\Subscriber;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
@@ -99,6 +100,10 @@ class BotManController extends Controller
             } catch (\Exception $e) {
                 //
             }
+        });
+
+        $this->bot->hears('/tabela', function (BotMan $bot) {
+            $bot->startConversation(new Tabela);
         });
 
         $this->bot->listen();

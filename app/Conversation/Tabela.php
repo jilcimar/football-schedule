@@ -1,23 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Conversation;
 
 use App\Models\Match;
-use App\Models\Subscriber;
+use BotMan\BotMan\Messages\Conversations\Conversation;
 use Carbon\Carbon;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
 use Weidner\Goutte\GoutteFacade;
-use Telegram\Bot\Laravel\Facades\Telegram;
-use function GuzzleHttp\Psr7\str;
 
-class Controller extends BaseController
+class Tabela extends Conversation
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    public function run()
+    {
+        $this->initial();
+    }
 
-    public function getDados()
+    public function initial()
     {
         $crawler = GoutteFacade::request('GET',
             'https://www.terra.com.br/esportes/futebol/brasileiro-serie-a/tabela/');
@@ -57,7 +54,13 @@ class Controller extends BaseController
                 . " \xF0\x9F\x8F\x81	: " . $dados[0]['jogos'][$key]. " Jogos\n"
                 ."-------------------------------------------------------";
         }
-        dd($firstPart);
-    }
 
+       $this->say($firstPart);
+
+        $this->say("\xF0\x9F\x9A\xA9  /jogosdehoje - Lista de jogos do dia\n".
+            "\xF0\x9F\x93\x85  /jogosamanha - Lista de jogos de amanhã\n".
+            "\xF0\x9F\x93\x88  /tabela");
+
+        return true;
+    }
 }
