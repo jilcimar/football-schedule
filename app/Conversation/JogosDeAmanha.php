@@ -19,11 +19,11 @@ class JogosDeAmanha extends Conversation
         $jogos = Match::where('today', false)->get()->chunk(15);
 
         if(count($jogos)==0) {
-            $this->say("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
+            $this->say("Sem jogos para amanhã! \n \xF0\x9F\x91\x89 /jogosdehoje - Lista de jogos hoje");
         };
 
         $date = Carbon::now()->addDays(1)->format('d/m/Y');
-        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
+        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE AMANHÃ ".$date."\n";
 
         foreach ($jogos[0] as $jogo) {
             $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
