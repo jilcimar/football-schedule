@@ -57,8 +57,8 @@ class Tabela extends Conversation
 
        $this->say($firstPart);
 
-        $this->say("\xF0\x9F\x9A\xA9  /jogosdehoje - Lista de jogos do dia\n".
-            "\xF0\x9F\x93\x85  /jogosamanha - Lista de jogos de amanhã\n".
+        $this->say("\xE2\x9A\xBD  /jogosdehoje - Lista de jogos do dia\n\n".
+            "\xF0\x9F\x93\x85  /jogosamanha - Lista de jogos de amanhã\n\n".
             "\xF0\x9F\x93\x88  /tabela");
 
         return true;
