@@ -3,9 +3,12 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\Controller;
+use App\Models\League;
+use App\Models\Match;
 use App\Models\Subscriber;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Telegram\Bot\Laravel\Facades\Telegram;
 use Weidner\Goutte\GoutteFacade;
 
@@ -80,6 +83,9 @@ class TelegramCron extends Command
 
         $dados =  array_filter($dados);
 
+        DB::table('matches')->delete();
+
+
         $date = Carbon::now()->format('d/m/Y');
 
         //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
@@ -88,6 +94,9 @@ class TelegramCron extends Command
         $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
 
         foreach ($jogos[0] as $jogo) {
+
+            $this->saveMatches($jogo);
+
             $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
                 . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
                 . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
@@ -101,6 +110,9 @@ class TelegramCron extends Command
         if(isset($jogos[1])) {
             $secondPart ='';
             foreach ($jogos[1] as $jogo) {
+
+                $this->saveMatches($jogo);
+
                 $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
                     . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
                     . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
@@ -114,6 +126,9 @@ class TelegramCron extends Command
         if(isset($jogos[2])) {
             $thirdPart ='';
             foreach ($jogos[2] as $jogo) {
+
+                $this->saveMatches($jogo);
+
                 $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
                     . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
                     . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
@@ -124,6 +139,63 @@ class TelegramCron extends Command
         }
 
         $this->sendMessage("\xF0\x9F\x91\x89  /jogosamanha - Lista de jogos de amanhã");
+
+
+        //SALVANDO OS JOGOS DE AMANHÃ
+
+        $dados = $crawler->filter('.table-bordered')
+            ->eq(1)
+            ->filter('tr[class="box"]')
+            ->each(function ($tr, $i){
+                //Pegando os campos específicos
+                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
+                    return trim($th->text());
+                });
+                $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
+                    return trim($td->text());
+                });
+                //Eliminando os Campeonatos
+                if( strpos($liga[$i][0], 'Russo') == false
+                    and strpos($liga[$i][0], 'Bielorrusso') == false
+                    and strpos($liga[$i][0], 'Série B') == false
+                    and strpos($liga[$i][0], 'Série C') == false
+                    and strpos($liga[$i][0], 'Série D') == false
+                    and strpos($liga[$i][0], 'Sub-20') == false
+                    and strpos($liga[$i][0], 'A3') == false
+                    and strpos($liga[$i][0], '2ª') == false
+                    and strpos($liga[$i][0], 'MX') == false
+                    and strpos($liga[$i][0], 'Feminino') == false ) {
+                    $dados['liga'] = $liga[$i][0];
+                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
+                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
+                    $dados['hora'] = $horario[$i][0];
+                    $dados['canal'] = $liga[$i][3];
+                    return $dados;
+                }
+            });
+
+        $dados =  array_filter($dados);
+
+        //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
+        $jogos = array_chunk($dados, 15);
+
+        foreach ($jogos[0] as $jogo) {
+            $this->saveMatches($jogo, false);
+        }
+
+        //2 Parte
+        if(isset($jogos[1])) {
+            foreach ($jogos[1] as $jogo) {
+                $this->saveMatches($jogo,false);
+            }
+        }
+
+        //3 Parte
+        if(isset($jogos[2])) {
+            foreach ($jogos[2] as $jogo) {
+                $this->saveMatches($jogo, false);
+            }
+        }
     }
 
     public function sendMessage ($text)
@@ -154,5 +226,32 @@ class TelegramCron extends Command
                 }
             }
         }
+    }
+
+
+    /**
+     * Método para salvar os jogos no banco
+     *
+     *
+     */
+
+    public function saveMatches ($jogo , $hoje = true) {
+        $league = League::updateOrCreate(
+            [
+                'name' => $jogo['liga'],
+            ],
+            [
+                'name' => $jogo['liga'],
+            ]
+        );
+
+        Match::create([
+            'team1' => $jogo['time1'],
+            'team2'=>$jogo['time2'],
+            'horary'=>$jogo['hora'],
+            'channels'=>$jogo['canal'],
+            'today'=>$hoje,
+            'league_id'=> $league->id
+        ]);
     }
 }
