@@ -18,22 +18,35 @@ class Controller extends BaseController
 
     public function getDados()
     {
-        $jogos = Match::where('today', true)->get()->chunk(15);
+        $crawler = GoutteFacade::request('GET',
+            'https://www.terra.com.br/esportes/futebol/brasileiro-serie-a/tabela/');
 
-        if(count($jogos)==0) {
-            $this->sendMessage("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
-        };
+        $dados = $crawler->filter('table')
+            ->eq(0)
+            ->filter('tbody')
+            ->each(function ($tr, $i){
+                //Pegando os campos específicos
+                $posicao[$i] = $tr->filter('td[class="main position"]')->each(function ($th) {
+                    return trim($th->text());
+                });
+                $time[$i] =  $tr->filter('td[class="main team-name"]')->each(function ($th) {
+                    return trim($th->text());
+                });
+                $pontos[$i] =  $tr->filter('td[class="points"]')->each(function ($th) {
+                    return trim($th->text());
+                });
 
-        $date = Carbon::now()->format('d/m/Y');
-        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
-        dd($jogos[1], $jogos);
-        foreach ($jogos[0] as $jogo) {
-            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
-                . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
-                . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
-                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
-                ."-------------------------------------------------------";
-        }
+                $jogos[$i] =  $tr->filter('td[title="Jogos"]')->each(function ($th) {
+                    return trim($th->text());
+                });
+
+                $dados['posicao'] = $posicao[$i];
+                $dados['time'] = $time[$i];
+                $dados['pontos'] = $pontos[$i];
+                $dados['jogos'] =  $jogos[$i];
+                return $dados;
+            });
+        dd($dados);
     }
 
 }
