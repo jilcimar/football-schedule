@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Match;
 use App\Models\Subscriber;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -17,77 +18,22 @@ class Controller extends BaseController
 
     public function getDados()
     {
-        $crawler = GoutteFacade::request('GET',
-            'https://www.futebolnatv.com.br/');
+        $jogos = Match::where('today', true)->get()->chunk(15);
 
-        $dados = $crawler->filter('.table-bordered')
-            ->eq(0)
-            ->filter('tr[class="box"]')
-            ->each(function ($tr, $i){
-                //Pegando os campos específicos
-                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
-                    return trim($th->text());
-                });
-                $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
-                    return trim($td->text());
-                });
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Russo') == false
-                    and strpos($liga[$i][0], 'Bielorrusso') == false
-                    and strpos($liga[$i][0], 'Série B') == false
-                    and strpos($liga[$i][0], 'Série C') == false
-                    and strpos($liga[$i][0], 'Série D') == false
-                    and strpos($liga[$i][0], 'Sub-20') == false
-                    and strpos($liga[$i][0], 'A3') == false
-                    and strpos($liga[$i][0], '2ª') == false
-                    and strpos($liga[$i][0], 'MX') == false
-                    and strpos($liga[$i][0], 'Feminino') == false ) {
+        if(count($jogos)==0) {
+            $this->sendMessage("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
+        };
 
-                    $dados['liga'] = $liga[$i][0];
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                    $dados['hora'] = $horario[$i][0];
-                    $dados['canal'] = $liga[$i][3];
-                    return $dados;
-                }
-            });
-
-        $dados =  array_filter($dados);
-
-        $dadosAmanha = $crawler->filter('.table-bordered')
-            ->eq(1)
-            ->filter('tr[class="box"]')
-            ->each(function ($tr, $i){
-                //Pegando os campos específicos
-                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
-                    return trim($th->text());
-                });
-                $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
-                    return trim($td->text());
-                });
-
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Russo') == false
-                    and strpos($liga[$i][0], 'Bielorrusso') == false
-                    and strpos($liga[$i][0], 'Série B') == false
-                    and strpos($liga[$i][0], 'Série C') == false
-                    and strpos($liga[$i][0], 'Série D') == false
-                    and strpos($liga[$i][0], 'Sub-20') == false
-                    and strpos($liga[$i][0], 'A3') == false
-                    and strpos($liga[$i][0], '2ª') == false
-                    and strpos($liga[$i][0], 'MX') == false
-                    and strpos($liga[$i][0], 'Feminino') == false )
-                {
-                    $dados['liga']= $liga[$i][0];
-                    $dados['time1']= preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['time2']= preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                    $dados['hora']= $horario[$i][0];
-                    $dados['canal']= $liga[$i][3];
-                    return $dados;
-                }
-            });
-
-        return \GuzzleHttp\json_encode(['JOGOS DE AMANHA'=> $dadosAmanha]);
+        $date = Carbon::now()->format('d/m/Y');
+        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
+        dd($jogos[1], $jogos);
+        foreach ($jogos[0] as $jogo) {
+            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
+                . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
+                . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                ."-------------------------------------------------------";
+        }
     }
 
 }

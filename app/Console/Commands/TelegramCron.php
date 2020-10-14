@@ -85,64 +85,11 @@ class TelegramCron extends Command
 
         DB::table('matches')->delete();
 
-
-        $date = Carbon::now()->format('d/m/Y');
-
-        //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
-        $jogos = array_chunk($dados, 15);
-
-        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
-
-        foreach ($jogos[0] as $jogo) {
-
+        foreach ($dados as $jogo) {
             $this->saveMatches($jogo);
-
-            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
-                . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
-                . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
-                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
-                ."-------------------------------------------------------";
         }
-
-        $this->sendMessage($firstPart);
-
-        //2 Mensagem
-        if(isset($jogos[1])) {
-            $secondPart ='';
-            foreach ($jogos[1] as $jogo) {
-
-                $this->saveMatches($jogo);
-
-                $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
-                    . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
-                    . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
-                    . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
-                    ."-------------------------------------------------------";
-            }
-            $this->sendMessage($secondPart);
-        }
-
-        //3 Mensagem
-        if(isset($jogos[2])) {
-            $thirdPart ='';
-            foreach ($jogos[2] as $jogo) {
-
-                $this->saveMatches($jogo);
-
-                $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
-                    . " \xE2\x9A\xBD : ". $jogo['time1'] . " x ". $jogo['time2'] ."\n"
-                    . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
-                    . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
-                    ."-------------------------------------------------------";
-            }
-            $this->sendMessage($thirdPart);
-        }
-
-        $this->sendMessage("\xF0\x9F\x91\x89  /jogosamanha - Lista de jogos de amanhã");
-
 
         //SALVANDO OS JOGOS DE AMANHÃ
-
         $dados = $crawler->filter('.table-bordered')
             ->eq(1)
             ->filter('tr[class="box"]')
@@ -175,27 +122,59 @@ class TelegramCron extends Command
             });
 
         $dados =  array_filter($dados);
-
-        //Dividindo os dados para envio devido uma limitação no tamanho da mensagem
-        $jogos = array_chunk($dados, 15);
-
-        foreach ($jogos[0] as $jogo) {
+        foreach ($dados as $jogo) {
             $this->saveMatches($jogo, false);
         }
 
-        //2 Parte
-        if(isset($jogos[1])) {
-            foreach ($jogos[1] as $jogo) {
-                $this->saveMatches($jogo,false);
-            }
+        //ENVIANDO A MENSAGEM A PARTIR DO BANCO
+
+        $jogos = Match::where('today', true)->get()->chunk(15);
+
+        if(count($jogos)==0) {
+            $this->sendMessage("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
+        };
+
+        $date = Carbon::now()->format('d/m/Y');
+        $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
+
+        foreach ($jogos[0] as $jogo) {
+            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
+                . " \xE2\x9A\xBD : ". $jogo->team1 . " x ". $jogo->team2 ."\n"
+                . " \xF0\x9F\x95\xA7 : ".$jogo->horary."\n"
+                . " \xF0\x9F\x93\xBA : " . $jogo->channels. "\n"
+                ."-------------------------------------------------------";
         }
 
-        //3 Parte
-        if(isset($jogos[2])) {
-            foreach ($jogos[2] as $jogo) {
-                $this->saveMatches($jogo, false);
+        $this->sendMessage($firstPart);
+
+        //2 Mensagem
+        if(isset($jogos[1])) {
+            $secondPart ='';
+            foreach ($jogos[1] as $jogo) {
+                $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
+                    . " \xE2\x9A\xBD : ". $jogo->team1 . " x ". $jogo->team2 ."\n"
+                    . " \xF0\x9F\x95\xA7 : ".$jogo->horary."\n"
+                    . " \xF0\x9F\x93\xBA : " . $jogo->channels. "\n"
+                    ."-------------------------------------------------------";
             }
+            $this->sendMessage($secondPart);
         }
+
+        //3 Mensagem
+        if(isset($jogos[2])) {
+            $thirdPart ='';
+            foreach ($jogos[2] as $jogo) {
+                $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
+                    . " \xE2\x9A\xBD : ". $jogo->team1 . " x ". $jogo->team2 ."\n"
+                    . " \xF0\x9F\x95\xA7 : ".$jogo->horary."\n"
+                    . " \xF0\x9F\x93\xBA : " . $jogo->channels. "\n"
+                    ."-------------------------------------------------------";
+            }
+            $this->sendMessage($thirdPart);
+        }
+
+        $this->sendMessage("\xF0\x9F\x91\x89  /jogosamanha - Lista de jogos de amanhã");
+
     }
 
     public function sendMessage ($text)
