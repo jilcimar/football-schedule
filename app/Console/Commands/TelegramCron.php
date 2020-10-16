@@ -111,6 +111,9 @@ class TelegramCron extends Command
                     and strpos($liga[$i][0], 'A3') == false
                     and strpos($liga[$i][0], '2ª') == false
                     and strpos($liga[$i][0], 'MX') == false
+                    and strpos($liga[$i][0], 'Chinesa') == false
+                    and strpos($liga[$i][0], 'Aspirantes') == false
+                    and strpos($liga[$i][0], 'Turco') == false
                     and strpos($liga[$i][0], 'Feminino') == false ) {
                     $dados['liga'] = $liga[$i][0];
                     $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
