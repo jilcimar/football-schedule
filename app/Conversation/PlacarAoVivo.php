@@ -44,7 +44,7 @@ class PlacarAoVivo extends Conversation
                     $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
                     $dados['palcarTime2'] = isset($placarTime2)?(int)$placarTime2:'-';
                     $dados['hora'] = $horario[$i][0];
-                    $dados['tempo'] = isset($tempo[$i][0])?$tempo[$i][0]:'';
+                    $dados['tempo'] = isset($tempo[$i][0])?' - '.$tempo[$i][0]:'';
                     $dados['canal'] = $liga[$i][3];
                     return $dados;
                 }
@@ -53,13 +53,13 @@ class PlacarAoVivo extends Conversation
         $dados =  array_filter($dados);
 
         $date = Carbon::now()->format('d/m/Y');
-        $firstPart = "\xF0\x9F\x9A\xA9	RESULTADOS AGORA - BRASILEIRÃO SÉRIE A ".$date."\n";
+        $firstPart = "\xF0\x9F\x9A\xA9	RESULTADOS AGORA - BRASILEIRÃO SÉRIE A - ".$date."\n";
 
 
         foreach ($dados as $jogo) {
-            $firstPart = $firstPart. "\n\xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+            $firstPart = $firstPart. "\n \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
                     $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
-                . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].' - '.$jogo['tempo']."\n"
+                . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].$jogo['tempo']."\n"
                 . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
                 ."-------------------------------------------------------";
         }
