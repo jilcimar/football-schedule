@@ -57,8 +57,7 @@ class PlacarAoVivo extends Conversation
 
 
         foreach ($dados as $jogo) {
-            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
-                . " \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+            $firstPart = $firstPart. "\n\xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
                     $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
                 . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].' - '.$jogo['tempo']."\n"
                 . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
