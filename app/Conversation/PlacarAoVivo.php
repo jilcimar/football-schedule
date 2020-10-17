@@ -34,8 +34,8 @@ class PlacarAoVivo extends Conversation
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Série A') != false) {
+                //Filtrando só série A
+                if( strpos($liga[$i][0], 'Série A') != false ) {
                     $placarTime1 = explode(" ", $liga[$i][1])[0];
                     $placarTime2 = explode(" ", $liga[$i][2])[0];
 
