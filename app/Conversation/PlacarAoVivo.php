@@ -40,9 +40,9 @@ class PlacarAoVivo extends Conversation
                     $placarTime2 = explode(" ", $liga[$i][2])[0];
 
                     $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['palcarTime1'] = isset($placarTime1)?$placarTime1:'-';
+                    $dados['palcarTime1'] = isset($placarTime1)?(int)$placarTime1:'-';
                     $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                    $dados['palcarTime2'] = isset($placarTime2)?$placarTime2:'-';
+                    $dados['palcarTime2'] = isset($placarTime2)?(int)$placarTime2:'-';
                     $dados['hora'] = $horario[$i][0];
                     $dados['tempo'] = isset($tempo[$i][0])?$tempo[$i][0]:'';
                     $dados['canal'] = $liga[$i][3];

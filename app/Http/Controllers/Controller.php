@@ -36,10 +36,12 @@ class Controller extends BaseController
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Série A') != false) {
+                //Filtrando só série A
+                if( strpos($liga[$i][0], 'Italiano') != false ) {
                     $placarTime1 = explode(" ", $liga[$i][1])[0];
                     $placarTime2 = explode(" ", $liga[$i][2])[0];
+
+//                    dd($placarTime1, (int)$liga[$i][1]);
 
                     $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
                     $dados['palcarTime1'] = isset($placarTime1)?$placarTime1:'-';
@@ -53,6 +55,18 @@ class Controller extends BaseController
             });
 
         $dados =  array_filter($dados);
+
+        $date = Carbon::now()->format('d/m/Y');
+        $firstPart = "\xF0\x9F\x9A\xA9	RESULTADOS AGORA - BRASILEIRÃO SÉRIE A ".$date."\n";
+
+
+        foreach ($dados as $jogo) {
+            $firstPart = $firstPart. "\n\xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+                $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
+                . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].' - '.$jogo['tempo']."\n"
+                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                ."-------------------------------------------------------";
+        }
 
         dd($dados);
     }
