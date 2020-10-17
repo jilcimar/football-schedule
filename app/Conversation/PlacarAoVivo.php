@@ -1,24 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Conversation;
 
 use App\Models\Match;
-use App\Models\Subscriber;
+use BotMan\BotMan\Messages\Conversations\Conversation;
 use Carbon\Carbon;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Routing\Controller as BaseController;
 use Weidner\Goutte\GoutteFacade;
-use Telegram\Bot\Laravel\Facades\Telegram;
-use function GuzzleHttp\Psr7\str;
 
-class Controller extends BaseController
+class PlacarAoVivo extends Conversation
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
-    public function getDados()
+    public function run()
     {
+        $this->initial();
+    }
+
+    public function initial()
+    {
+
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
@@ -54,7 +52,21 @@ class Controller extends BaseController
 
         $dados =  array_filter($dados);
 
-        dd($dados);
-    }
+        $date = Carbon::now()->format('d/m/Y');
+        $firstPart = "\xF0\x9F\x9A\xA9	RESULTADOS AGORA - BRASILEIRÃO SÉRIE A ".$date."\n";
 
+
+        foreach ($dados as $jogo) {
+            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo['liga'] . "\n"
+                . " \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+                    $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
+                . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].' - '.$jogo['tempo']."\n"
+                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                ."-------------------------------------------------------";
+        }
+
+        $this->say($firstPart);
+
+        return true;
+    }
 }

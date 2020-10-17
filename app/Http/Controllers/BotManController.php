@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Conversation\JogosDeAmanha;
 use App\Conversation\JogosDeHoje;
+use App\Conversation\PlacarAoVivo;
 use App\Conversation\StartConversation;
 use App\Conversation\Tabela;
 use App\Models\Subscriber;
@@ -43,6 +44,7 @@ class BotManController extends Controller
 
     public function handle()
     {
+        //START DO BOT
         $this->bot->hears('/start', function (BotMan $bot) {
             try {
                 $user = $this->bot->getUser();
@@ -62,6 +64,7 @@ class BotManController extends Controller
             }
         });
 
+        //JOGOS DE HOJE
         $this->bot->hears('/jogosdehoje', function (BotMan $bot) {
             try {
                 $user = $this->bot->getUser();
@@ -81,8 +84,7 @@ class BotManController extends Controller
             }
         });
 
-
-
+        //JOGOS DE AMANHÃ
         $this->bot->hears('/jogosamanha', function (BotMan $bot) {
             try {
                 $user = $this->bot->getUser();
@@ -102,8 +104,14 @@ class BotManController extends Controller
             }
         });
 
+        //CLASSIFICAÇÃO DO BRASILEIRÃO SÉRIE A
         $this->bot->hears('/tabela', function (BotMan $bot) {
             $bot->startConversation(new Tabela);
+        });
+
+        //PLACAR AO VIVO DOS JOGOS DA SÉRIE A
+        $this->bot->hears('/placaraovivo', function (BotMan $bot) {
+            $bot->startConversation(new PlacarAoVivo);
         });
 
         $this->bot->listen();
