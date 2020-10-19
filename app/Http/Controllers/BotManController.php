@@ -108,13 +108,24 @@ class BotManController extends Controller
             }
         });
 
+        $this->bot->hears('/jogosamanha@futebolnatv_bot', function (BotMan $bot) {
+            $bot->startConversation(new JogosDeAmanha);
+        });
+
         //CLASSIFICAÇÃO DO BRASILEIRÃO SÉRIE A
         $this->bot->hears('/tabela', function (BotMan $bot) {
             $bot->startConversation(new Tabela);
         });
 
+        $this->bot->hears('/tabela@futebolnatv_bot', function (BotMan $bot) {
+            $bot->startConversation(new Tabela);
+        });
+
         //PLACAR AO VIVO DOS JOGOS DA SÉRIE A
         $this->bot->hears('/placaraovivo', function (BotMan $bot) {
+            $bot->startConversation(new PlacarAoVivo);
+        });
+        $this->bot->hears('/placaraovivo@futebolnatv_bot', function (BotMan $bot) {
             $bot->startConversation(new PlacarAoVivo);
         });
 
