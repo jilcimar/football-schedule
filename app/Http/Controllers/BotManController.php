@@ -84,6 +84,10 @@ class BotManController extends Controller
             }
         });
 
+        $this->bot->hears('/jogosdehoje@futebolnatv_bot', function (BotMan $bot) {
+            $bot->startConversation(new JogosDeHoje);
+        });
+
         //JOGOS DE AMANHÃ
         $this->bot->hears('/jogosamanha', function (BotMan $bot) {
             try {
