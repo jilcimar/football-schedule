@@ -19,6 +19,8 @@ class Controller extends BaseController
 
     public function getDados()
     {
+        \Log::info("Cron executando!");
+
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
@@ -27,47 +29,42 @@ class Controller extends BaseController
             ->filter('tr[class="box"]')
             ->each(function ($tr, $i){
                 //Pegando os campos específicos
-                $horario[$i] = $tr->filter('th')->filter('h4')->eq(0)->each(function ($th) {
-                    return trim($th->text());
-                });
-                $tempo[$i] = $tr->filter('th')->filter('span')->eq(0)->each(function ($th) {
+                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
                     return trim($th->text());
                 });
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-                //Filtrando só série A
-                if( strpos($liga[$i][0], 'Italiano') != false ) {
-                    $placarTime1 = explode(" ", $liga[$i][1])[0];
-                    $placarTime2 = explode(" ", $liga[$i][2])[0];
 
-//                    dd($placarTime1, (int)$liga[$i][1]);
+                $time [$i] = $tr->filter('td')->filter('span')->each(function ($td) {
+                    return trim($td->text());
+                });
+                //Eliminando os Campeonatos
+                if( strpos($liga[$i][0], 'Russo') == false
+                    and strpos($liga[$i][0], 'Bielorrusso') == false
+                    and strpos($liga[$i][0], 'Série B') == false
+                    and strpos($liga[$i][0], 'Série C') == false
+                    and strpos($liga[$i][0], 'Série D') == false
+                    and strpos($liga[$i][0], 'Sub-20') == false
+                    and strpos($liga[$i][0], 'A3') == false
+                    and strpos($liga[$i][0], '2ª') == false
+                    and strpos($liga[$i][0], 'MX') == false
+                    and strpos($liga[$i][0], 'Feminino') == false ) {
 
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['palcarTime1'] = isset($placarTime1)?$placarTime1:'-';
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                    $dados['palcarTime2'] = isset($placarTime2)?$placarTime2:'-';
+                    $time1 = isset($time[$i][0]) ? $time[$i][0] :'';
+                    $time2 = isset($time[$i][1]) ? $time[$i][1] :'';
+                    $canal = isset($time[$i][2]) ? $time[$i][2] :'';
+
+                    $dados['liga'] = $liga[$i][0];
+                    $dados['time1'] = preg_replace('/[0-9]+/', '', $time1);
+                    $dados['time2'] = preg_replace('/[0-9]+/', '', $time2);
                     $dados['hora'] = $horario[$i][0];
-                    $dados['tempo'] = isset($tempo[$i][0])?$tempo[$i][0]:'';
-                    $dados['canal'] = $liga[$i][3];
+                    $dados['canal'] = $canal;
                     return $dados;
                 }
             });
 
         $dados =  array_filter($dados);
-
-        $date = Carbon::now()->format('d/m/Y');
-        $firstPart = "\xF0\x9F\x9A\xA9	RESULTADOS AGORA - BRASILEIRÃO SÉRIE A ".$date."\n";
-
-
-        foreach ($dados as $jogo) {
-            $firstPart = $firstPart. "\n\xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
-                $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
-                . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].' - '.$jogo['tempo']."\n"
-                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
-                ."-------------------------------------------------------";
-        }
-
         dd($dados);
     }
 

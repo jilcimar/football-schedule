@@ -61,9 +61,9 @@ class JogosDeAmanha extends Conversation
             $this->say($thirdPart);
         }
 
-        $this->say("\xE2\x9A\xBD  /jogosdehoje - Lista de jogos do dia\n\n".
-            "\xF0\x9F\x93\x85  /jogosamanha - Lista de jogos de amanhã\n\n".
-            "\xF0\x9F\x93\x88  /tabela - Tabela do Brasileirão Série A");
+//        $this->say("\xE2\x9A\xBD  /jogosdehoje - Lista de jogos do dia\n\n".
+//            "\xF0\x9F\x93\x85  /jogosamanha - Lista de jogos de amanhã\n\n".
+//            "\xF0\x9F\x93\x88  /tabela - Tabela do Brasileirão Série A");
 
         return true;
     }
