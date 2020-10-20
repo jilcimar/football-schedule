@@ -109,15 +109,9 @@ class TelegramCron extends Command
                 $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
                     return trim($th->text());
                 });
-
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-
-                $time [$i] = $tr->filter('td')->filter('span')->each(function ($td) {
-                    return trim($td->text());
-                });
-
                 //Eliminando os Campeonatos
                 if( strpos($liga[$i][0], 'Russo') == false
                     and strpos($liga[$i][0], 'Bielorrusso') == false
@@ -133,16 +127,11 @@ class TelegramCron extends Command
                     and strpos($liga[$i][0], 'Escocês') == false
                     and strpos($liga[$i][0], 'Turco') == false
                     and strpos($liga[$i][0], 'Feminino') == false ) {
-
-                    $time1 = isset($time[$i][0]) ? $time[$i][0] :'';
-                    $time2 = isset($time[$i][1]) ? $time[$i][1] :'';
-                    $canal = isset($time[$i][2]) ? $time[$i][2] :'';
-
                     $dados['liga'] = $liga[$i][0];
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $time1);
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $time2);
+                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
+                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
                     $dados['hora'] = $horario[$i][0];
-                    $dados['canal'] = $canal;
+                    $dados['canal'] = $liga[$i][3];
                     return $dados;
                 }
             });
