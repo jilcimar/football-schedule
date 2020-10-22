@@ -16,7 +16,6 @@ class PlacarAoVivo extends Conversation
 
     public function initial()
     {
-
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
@@ -28,24 +27,29 @@ class PlacarAoVivo extends Conversation
                 $horario[$i] = $tr->filter('th')->filter('h4')->eq(0)->each(function ($th) {
                     return trim($th->text());
                 });
-                $tempo[$i] = $tr->filter('th')->filter('span')->eq(0)->each(function ($th) {
+                $tempo[$i] = $tr->filter('th')->filter('div')->eq(0)->each(function ($th) {
                     return trim($th->text());
                 });
+
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
+
+                $time [$i] = $tr->filter('td')->filter('span')->each(function ($td) {
+                    return trim($td->text());
+                });
+
                 //Filtrando só série A
                 if( strpos($liga[$i][0], 'Série A') != false ) {
-                    $placarTime1 = explode(" ", $liga[$i][1])[0];
-                    $placarTime2 = explode(" ", $liga[$i][2])[0];
-
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
+                    $placarTime1 = explode(" ", $time[$i][1])[0];
+                    $placarTime2 = explode(" ", $time[$i][2])[0];
+                    $dados['time1'] = preg_replace('/[0-9]+/', '', $time[$i][0]);
                     $dados['palcarTime1'] = isset($placarTime1)?(int)$placarTime1:'-';
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
+                    $dados['time2'] = preg_replace('/[0-9]+/', '', $time[$i][2]);
                     $dados['palcarTime2'] = isset($placarTime2)?(int)$placarTime2:'-';
                     $dados['hora'] = $horario[$i][0];
                     $dados['tempo'] = isset($tempo[$i][0])?' - '.$tempo[$i][0]:'';
-                    $dados['canal'] = $liga[$i][3];
+                    $dados['canal'] = $time[$i][3];
                     return $dados;
                 }
             });

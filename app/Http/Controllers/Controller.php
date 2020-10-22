@@ -22,38 +22,37 @@ class Controller extends BaseController
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
-        //SALVANDO OS JOGOS DE AMANHÃ
         $dados = $crawler->filter('.table-bordered')
-            ->eq(1)
+            ->eq(0)
             ->filter('tr[class="box"]')
             ->each(function ($tr, $i){
                 //Pegando os campos específicos
-                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
+                $horario[$i] = $tr->filter('th')->filter('h4')->eq(0)->each(function ($th) {
                     return trim($th->text());
                 });
+                $tempo[$i] = $tr->filter('th')->filter('div')->eq(0)->each(function ($th) {
+                    return trim($th->text());
+                });
+
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Russo') == false
-                    and strpos($liga[$i][0], 'Bielorrusso') == false
-                    and strpos($liga[$i][0], 'Série B') == false
-                    and strpos($liga[$i][0], 'Série C') == false
-                    and strpos($liga[$i][0], 'Série D') == false
-                    and strpos($liga[$i][0], 'Sub-20') == false
-                    and strpos($liga[$i][0], 'A3') == false
-                    and strpos($liga[$i][0], '2ª') == false
-                    and strpos($liga[$i][0], 'MX') == false
-                    and strpos($liga[$i][0], 'Chinesa') == false
-                    and strpos($liga[$i][0], 'Aspirantes') == false
-                    and strpos($liga[$i][0], 'Escocês') == false
-                    and strpos($liga[$i][0], 'Turco') == false
-                    and strpos($liga[$i][0], 'Feminino') == false ) {
-                    $dados['liga'] = $liga[$i][0];
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
+
+                $time [$i] = $tr->filter('td')->filter('span')->each(function ($td) {
+                    return trim($td->text());
+                });
+
+                //Filtrando só série A
+                if( strpos($liga[$i][0], 'Série A') != false ) {
+                    $placarTime1 = explode(" ", $time[$i][1])[0];
+                    $placarTime2 = explode(" ", $time[$i][2])[0];
+                    $dados['time1'] = preg_replace('/[0-9]+/', '', $time[$i][0]);
+                    $dados['palcarTime1'] = isset($placarTime1)?(int)$placarTime1:'-';
+                    $dados['time2'] = preg_replace('/[0-9]+/', '', $time[$i][2]);
+                    $dados['palcarTime2'] = isset($placarTime2)?(int)$placarTime2:'-';
                     $dados['hora'] = $horario[$i][0];
-                    $dados['canal'] = $liga[$i][3];
+                    $dados['tempo'] = isset($tempo[$i][0])?' - '.$tempo[$i][0]:'';
+                    $dados['canal'] = $time[$i][3];
                     return $dados;
                 }
             });
