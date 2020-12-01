@@ -74,6 +74,7 @@ class TelegramCron extends Command
                     and strpos($liga[$i][0], 'Aspirantes') == false
                     and strpos($liga[$i][0], 'Escocês') == false
                     and strpos($liga[$i][0], 'Turco') == false
+                    and strpos($liga[$i][0], 'MLS') == false
                     and strpos($liga[$i][0], 'Feminino') == false
                     and strpos($liga[$i][0], '2') == false) {
                     $dados['liga'] = $liga[$i][0];
@@ -119,6 +120,7 @@ class TelegramCron extends Command
                     and strpos($liga[$i][0], 'Aspirantes') == false
                     and strpos($liga[$i][0], 'Escocês') == false
                     and strpos($liga[$i][0], 'Turco') == false
+                    and strpos($liga[$i][0], 'MLS') == false
                     and strpos($liga[$i][0], 'Feminino') == false
                     and strpos($liga[$i][0], '2') == false ) {
                     $dados['liga'] = $liga[$i][0];
