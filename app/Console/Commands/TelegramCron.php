@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Controllers\Controller;
 use App\Models\League;
 use App\Models\Match;
 use App\Models\Subscriber;
@@ -71,6 +70,10 @@ class TelegramCron extends Command
                     and strpos($liga[$i][0], 'A3') == false
                     and strpos($liga[$i][0], '2ª') == false
                     and strpos($liga[$i][0], 'MX') == false
+                    and strpos($liga[$i][0], 'Chinesa') == false
+                    and strpos($liga[$i][0], 'Aspirantes') == false
+                    and strpos($liga[$i][0], 'Escocês') == false
+                    and strpos($liga[$i][0], 'Turco') == false
                     and strpos($liga[$i][0], 'Feminino') == false ) {
                     $dados['liga'] = $liga[$i][0];
                     $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
@@ -176,9 +179,6 @@ class TelegramCron extends Command
             }
             $this->sendMessage($thirdPart);
         }
-
-        $this->sendMessage("\xF0\x9F\x91\x89  /jogosamanha - Lista de jogos de amanhã");
-
     }
 
     public function sendMessage ($text)
