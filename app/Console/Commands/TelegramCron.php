@@ -44,8 +44,6 @@ class TelegramCron extends Command
      */
     public function handle()
     {
-        \Log::info("Cron executando!");
-
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
