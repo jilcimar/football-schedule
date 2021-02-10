@@ -18,14 +18,14 @@ class TelegramCron extends Command
      *
      * @var string
      */
-    protected $signature = 'demo:cron';
+    protected $signature = 'scraping:cron';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Envio de mensagens para o bot';
+    protected $description = 'scraping dos jogos';
 
     /**
      * Create a new command instance.
@@ -52,7 +52,7 @@ class TelegramCron extends Command
         $dados = $crawler->filter('.table-bordered')
             ->eq(0)
             ->filter('tr[class="box"]')
-            ->each(function ($tr, $i){
+            ->each(function ($tr, $i) {
                 //Pegando os campos específicos
                 $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
                     return trim($th->text());
@@ -60,23 +60,8 @@ class TelegramCron extends Command
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Russo') == false
-                    and strpos($liga[$i][0], 'Bielorrusso') == false
-                    and strpos($liga[$i][0], 'Série B') == false
-                    and strpos($liga[$i][0], 'Série C') == false
-                    and strpos($liga[$i][0], 'Série D') == false
-                    and strpos($liga[$i][0], 'Sub-20') == false
-                    and strpos($liga[$i][0], 'A3') == false
-                    and strpos($liga[$i][0], '2ª') == false
-                    and strpos($liga[$i][0], 'MX') == false
-                    and strpos($liga[$i][0], 'Chinesa') == false
-                    and strpos($liga[$i][0], 'Aspirantes') == false
-                    and strpos($liga[$i][0], 'Escocês') == false
-                    and strpos($liga[$i][0], 'Turco') == false
-                    and strpos($liga[$i][0], 'MLS') == false
-                    and strpos($liga[$i][0], 'Feminino') == false
-                    and strpos($liga[$i][0], '2') == false) {
+
+                if( cleaningGames($liga[$i][0]) ) {
                     $dados['liga'] = $liga[$i][0];
                     $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
                     $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
@@ -98,31 +83,17 @@ class TelegramCron extends Command
         $dados = $crawler->filter('.table-bordered')
             ->eq(1)
             ->filter('tr[class="box"]')
-            ->each(function ($tr, $i){
+            ->each(function ($tr, $i) {
                 //Pegando os campos específicos
                 $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
                     return trim($th->text());
                 });
+
                 $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
                     return trim($td->text());
                 });
-                //Eliminando os Campeonatos
-                if( strpos($liga[$i][0], 'Russo') == false
-                    and strpos($liga[$i][0], 'Bielorrusso') == false
-                    and strpos($liga[$i][0], 'Série B') == false
-                    and strpos($liga[$i][0], 'Série C') == false
-                    and strpos($liga[$i][0], 'Série D') == false
-                    and strpos($liga[$i][0], 'Sub-20') == false
-                    and strpos($liga[$i][0], 'A3') == false
-                    and strpos($liga[$i][0], '2ª') == false
-                    and strpos($liga[$i][0], 'MX') == false
-                    and strpos($liga[$i][0], 'Chinesa') == false
-                    and strpos($liga[$i][0], 'Aspirantes') == false
-                    and strpos($liga[$i][0], 'Escocês') == false
-                    and strpos($liga[$i][0], 'Turco') == false
-                    and strpos($liga[$i][0], 'MLS') == false
-                    and strpos($liga[$i][0], 'Feminino') == false
-                    and strpos($liga[$i][0], '2') == false ) {
+
+                if(cleaningGames($liga[$i][0])) {
                     $dados['liga'] = $liga[$i][0];
                     $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
                     $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
@@ -133,17 +104,17 @@ class TelegramCron extends Command
             });
 
         $dados =  array_filter($dados);
+
         foreach ($dados as $jogo) {
             $this->saveMatches($jogo, false);
         }
 
-        //ENVIANDO A MENSAGEM A PARTIR DO BANCO
 
         $jogos = Match::where('today', true)->get()->chunk(15);
 
         if(count($jogos)==0) {
             $this->sendMessage("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
-        };
+        }
 
         $date = Carbon::now()->format('d/m/Y');
         $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
@@ -189,16 +160,13 @@ class TelegramCron extends Command
     {
         $subscribers = Subscriber::all();
 
-        if(env('MODE_TEST'))
-        {
+        if(env('MODE_TEST')) {
             Telegram::sendMessage([
                 'chat_id' => env('CHAT_TEST','375323134'),
                 'parse_mode' => 'HTML',
                 'text' => $text
             ]);
-        }
-        else
-        {
+        } else {
             foreach ($subscribers as $subscriber) {
                 try {
                     Telegram::sendMessage([
@@ -214,7 +182,6 @@ class TelegramCron extends Command
             }
         }
     }
-
 
     /**
      * Método para salvar os jogos no banco
