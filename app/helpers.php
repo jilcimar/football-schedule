@@ -1,6 +1,7 @@
 <?php
 
-use Illuminate\Support\Str;
+use App\Models\Subscriber;
+use Telegram\Bot\Laravel\Facades\Telegram;
 
 if (!function_exists('cleaningGames')) {
     /**
@@ -8,8 +9,7 @@ if (!function_exists('cleaningGames')) {
      *
      * @return boolean
      */
-    function cleaningGames($array)
-    {
+    function cleaningGames($array) {
        return  (strpos($array, 'Russo') == false
         and strpos($array, 'Bielorrusso') == false
         and strpos($array, 'Série B') == false
@@ -26,5 +26,33 @@ if (!function_exists('cleaningGames')) {
         and strpos($array, 'MLS') == false
         and strpos($array, 'Feminino') == false
         and strpos($array, '2') == false);
+    }
+}
+
+if (!function_exists('sendMessage')) {
+    function sendMessage ($text) {
+        if(env('MODE_TEST')) {
+            Telegram::sendMessage([
+                'chat_id' => env('CHAT_TEST'),
+                'parse_mode' => 'HTML',
+                'text' => $text
+            ]);
+        } else {
+            $subscribers = Subscriber::all();
+
+            foreach ($subscribers as $subscriber) {
+                try {
+                    Telegram::sendMessage([
+                        'chat_id' => $subscriber->chat_id,
+                        'parse_mode' => 'HTML',
+                        'text' => $text
+                    ]);
+                } catch (\Exception $exception) {
+                    $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
+                    $subscriberBlock->delete();
+                    \Log::info("Erro CHAT: ". $subscriber->chat_id);
+                }
+            }
+        }
     }
 }

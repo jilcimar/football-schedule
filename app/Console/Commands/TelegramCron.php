@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\League;
 use App\Models\Match;
 use App\Models\Subscriber;
+use App\Repositories\MatchRepository;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -44,166 +45,102 @@ class TelegramCron extends Command
      */
     public function handle()
     {
-        $crawler = GoutteFacade::request('GET',
-            'https://www.futebolnatv.com.br/');
-
-        $dados = $crawler->filter('.table-bordered')
-            ->eq(0)
-            ->filter('tr[class="box"]')
-            ->each(function ($tr, $i) {
-                //Pegando os campos específicos
-                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
-                    return trim($th->text());
-                });
-                $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
-                    return trim($td->text());
-                });
-
-                if( cleaningGames($liga[$i][0]) ) {
-                    $dados['liga'] = $liga[$i][0];
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                    $dados['hora'] = $horario[$i][0];
-                    $dados['canal'] = $liga[$i][3];
-                    return $dados;
-                }
-            });
-
-        $dados =  array_filter($dados);
-
         DB::table('matches')->delete();
 
-        foreach ($dados as $jogo) {
-            $this->saveMatches($jogo);
+        $model = new MatchRepository();
+
+        $data = $this->scraping(0);
+        $data =  array_filter($data);
+
+        foreach ($data as $match) {
+            $model->store($match);
         }
 
-        //SALVANDO OS JOGOS DE AMANHÃ
-        $dados = $crawler->filter('.table-bordered')
-            ->eq(1)
-            ->filter('tr[class="box"]')
-            ->each(function ($tr, $i) {
-                //Pegando os campos específicos
-                $horario[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
-                    return trim($th->text());
-                });
+        $data = $this->scraping(1);
+        $data =  array_filter($data);
 
-                $liga [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
-                    return trim($td->text());
-                });
-
-                if(cleaningGames($liga[$i][0])) {
-                    $dados['liga'] = $liga[$i][0];
-                    $dados['time1'] = preg_replace('/[0-9]+/', '', $liga[$i][1]);
-                    $dados['time2'] = preg_replace('/[0-9]+/', '', $liga[$i][2]);
-                    $dados['hora'] = $horario[$i][0];
-                    $dados['canal'] = $liga[$i][3];
-                    return $dados;
-                }
-            });
-
-        $dados =  array_filter($dados);
-
-        foreach ($dados as $jogo) {
-            $this->saveMatches($jogo, false);
+        foreach ($data as $match) {
+            $model->store($match, false);
         }
 
+        $this->todayGames();
+    }
 
-        $jogos = Match::where('today', true)->get()->chunk(15);
+    public function todayGames() {
 
-        if(count($jogos)==0) {
-            $this->sendMessage("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
+        $matchs = Match::where('today', true)->get()->chunk(15);
+
+        if(count($matchs)==0) {
+            sendMessage("Sem jogos hoje! \n \xF0\x9F\x91\x89 /jogosamanha - Lista de jogos de amanhã");
+            return;
         }
 
         $date = Carbon::now()->format('d/m/Y');
         $firstPart = "\xF0\x9F\x9A\xA9	 JOGOS DE HOJE ".$date."\n";
 
-        foreach ($jogos[0] as $jogo) {
-            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
-                . " \xE2\x9A\xBD : ". $jogo->team1 . " x ". $jogo->team2 ."\n"
-                . " \xF0\x9F\x95\xA7 : ".$jogo->horary."\n"
-                . " \xF0\x9F\x93\xBA : " . $jogo->channels. "\n"
+        foreach ($matchs[0] as $match) {
+            $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " . $match->league->name . "\n"
+                . " \xE2\x9A\xBD : ". $match->team1 . " x ". $match->team2 ."\n"
+                . " \xF0\x9F\x95\xA7 : ".$match->horary."\n"
+                . " \xF0\x9F\x93\xBA : " . $match->channels. "\n"
                 ."-------------------------------------------------------";
         }
 
-        $this->sendMessage($firstPart);
+        sendMessage($firstPart);
 
-        //2 Mensagem
-        if(isset($jogos[1])) {
+        //2 Part
+        if(isset($matchs[1])) {
             $secondPart ='';
-            foreach ($jogos[1] as $jogo) {
-                $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
-                    . " \xE2\x9A\xBD : ". $jogo->team1 . " x ". $jogo->team2 ."\n"
-                    . " \xF0\x9F\x95\xA7 : ".$jogo->horary."\n"
-                    . " \xF0\x9F\x93\xBA : " . $jogo->channels. "\n"
+            foreach ($matchs[1] as $match) {
+                $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " . $match->league->name . "\n"
+                    . " \xE2\x9A\xBD : ". $match->team1 . " x ". $match->team2 ."\n"
+                    . " \xF0\x9F\x95\xA7 : ".$match->horary."\n"
+                    . " \xF0\x9F\x93\xBA : " . $match->channels. "\n"
                     ."-------------------------------------------------------";
             }
-            $this->sendMessage($secondPart);
+            sendMessage($secondPart);
         }
 
-        //3 Mensagem
-        if(isset($jogos[2])) {
+        //3 Part
+        if(isset($matchs[2])) {
             $thirdPart ='';
-            foreach ($jogos[2] as $jogo) {
-                $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " . $jogo->league->name . "\n"
-                    . " \xE2\x9A\xBD : ". $jogo->team1 . " x ". $jogo->team2 ."\n"
-                    . " \xF0\x9F\x95\xA7 : ".$jogo->horary."\n"
-                    . " \xF0\x9F\x93\xBA : " . $jogo->channels. "\n"
+            foreach ($matchs[2] as $match) {
+                $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " . $match->league->name . "\n"
+                    . " \xE2\x9A\xBD : ". $match->team1 . " x ". $match->team2 ."\n"
+                    . " \xF0\x9F\x95\xA7 : ".$match->horary."\n"
+                    . " \xF0\x9F\x93\xBA : " . $match->channels. "\n"
                     ."-------------------------------------------------------";
             }
-            $this->sendMessage($thirdPart);
+            sendMessage($thirdPart);
         }
+
     }
 
-    public function sendMessage ($text)
+    public function scraping($day)
     {
-        $subscribers = Subscriber::all();
+        $crawler = GoutteFacade::request('GET',
+            'https://www.futebolnatv.com.br/');
 
-        if(env('MODE_TEST')) {
-            Telegram::sendMessage([
-                'chat_id' => env('CHAT_TEST','375323134'),
-                'parse_mode' => 'HTML',
-                'text' => $text
-            ]);
-        } else {
-            foreach ($subscribers as $subscriber) {
-                try {
-                    Telegram::sendMessage([
-                        'chat_id' => $subscriber->chat_id,
-                        'parse_mode' => 'HTML',
-                        'text' => $text
-                    ]);
-                } catch (\Exception $exception) {
-                    $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
-                    $subscriberBlock->delete();
-                    \Log::info("Erro CHAT: ". $subscriber->chat_id);
+        return $crawler->filter('.table-bordered')
+            ->eq($day)
+            ->filter('tr[class="box"]')
+            ->each(function ($tr, $i) {
+                $time[$i] = $tr->filter('th')->eq(0)->each(function ($th) {
+                    return trim($th->text());
+                });
+
+                $league [$i] = $tr->filter('td')->filter('div')->each(function ($td) {
+                    return trim($td->text());
+                });
+
+                if(cleaningGames($league[$i][0])) {
+                    $data['league'] = $league[$i][0];
+                    $data['team1'] = preg_replace('/[0-9]+/', '', $league[$i][1]);
+                    $data['team2'] = preg_replace('/[0-9]+/', '', $league[$i][2]);
+                    $data['time'] = $time[$i][0];
+                    $data['channel'] = $league[$i][3];
+                    return $data;
                 }
-            }
-        }
-    }
-
-    /**
-     * Método para salvar os jogos no banco
-     *
-     *
-     */
-
-    public function saveMatches ($jogo , $hoje = true) {
-        $league = League::updateOrCreate(
-            [
-                'name' => $jogo['liga'],
-            ],
-            [
-                'name' => $jogo['liga'],
-            ]
-        );
-
-        Match::create([
-            'team1' => $jogo['time1'],
-            'team2'=>$jogo['time2'],
-            'horary'=>$jogo['hora'],
-            'channels'=>$jogo['canal'],
-            'today'=>$hoje,
-            'league_id'=> $league->id
-        ]);
+            });
     }
 }
