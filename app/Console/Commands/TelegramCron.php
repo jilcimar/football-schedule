@@ -2,14 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Models\League;
 use App\Models\Match;
-use App\Models\Subscriber;
 use App\Repositories\MatchRepository;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Telegram\Bot\Laravel\Facades\Telegram;
 use Weidner\Goutte\GoutteFacade;
 
 class TelegramCron extends Command
@@ -26,15 +23,14 @@ class TelegramCron extends Command
      *
      * @var string
      */
-    protected $description = 'scraping dos jogos';
+    protected $description = 'collecting information from today matches';
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         parent::__construct();
     }
 
@@ -43,8 +39,7 @@ class TelegramCron extends Command
      *
      * @return int
      */
-    public function handle()
-    {
+    public function handle() {
         DB::table('matches')->delete();
 
         $model = new MatchRepository();
@@ -116,8 +111,7 @@ class TelegramCron extends Command
 
     }
 
-    public function scraping($day)
-    {
+    public function scraping($day) {
         $crawler = GoutteFacade::request('GET',
             'https://www.futebolnatv.com.br/');
 
