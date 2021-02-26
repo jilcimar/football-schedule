@@ -1,8 +1,8 @@
 # Futebol na TV BOT
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/jilcimar/futebol-na-tv-bot/master/public/icon.jpg" width="200" height="200">
-<img src="https://raw.githubusercontent.com/jilcimar/futebol-na-tv-bot/master/public/telegram.png" width="200" height="200">
+<img src="https://raw.githubusercontent.com/jilcimar/football-schedule/master/public/icon.png" width="200" height="200">
+<img src="https://raw.githubusercontent.com/jilcimar/football-schedule/master/public/telegram.png" width="200" height="200">
 </p>
 
 <p align="center">
