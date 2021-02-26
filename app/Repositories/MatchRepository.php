@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\League;
 use App\Models\Match;
-use App\Models\User;
 
 class  MatchRepository extends AbstractRepository
 {
