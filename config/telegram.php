@@ -1,40 +1,10 @@
 <?php
 
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Your Telegram Bots
-    |--------------------------------------------------------------------------
-    | You may use multiple bots at once using the manager class. Each bot
-    | that you own should be configured here.
-    |
-    | Here are each of the telegram bots config parameters.
-    |
-    | Supported Params:
-    |
-    | - name: The *personal* name you would like to refer to your bot as.
-    |
-    |       - username: Your Telegram Bot's Username.
-    |                       Example: (string) 'BotFather'.
-    |
-    |       - token:    Your Telegram Bot's Access Token.
-                        Refer for more details: https://core.telegram.org/bots#botfather
-    |                   Example: (string) '123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11'.
-    |
-    |       - commands: (Optional) Commands to register for this bot,
-    |                   Supported Values: "Command Group Name", "Shared Command Name", "Full Path to Class".
-    |                   Default: Registers Global Commands.
-    |                   Example: (array) [
-    |                       'admin', // Command Group Name.
-    |                       'status', // Shared Command Name.
-    |                       Acme\Project\Commands\BotFather\HelloCommand::class,
-    |                       Acme\Project\Commands\BotFather\ByeCommand::class,
-    |             ]
-    */
-    'bots'                         => [
+    'bots' => [
         'mybot' => [
             'username'            => 'futebolnatv_bot',
-            'token'               => env('TELEGRAM_BOT_TOKEN', '1253599841:AAGAkEoAaVrGfExEAOaVmU-p0XpZM0kRGoc'),
+            'token'               => env('TELEGRAM_BOT_TOKEN'),
             'certificate_path'    => env('TELEGRAM_CERTIFICATE_PATH', 'YOUR-CERTIFICATE-PATH'),
             'webhook_url'         => env('TELEGRAM_WEBHOOK_URL', '127.0.0.1'),
             'commands'            => [
