@@ -10,8 +10,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Weidner\Goutte\GoutteFacade;
-use Telegram\Bot\Laravel\Facades\Telegram;
-use function GuzzleHttp\Psr7\str;
 
 class Controller extends BaseController
 {
@@ -43,7 +41,7 @@ class Controller extends BaseController
                 });
 
                 //Filtrando só série A
-                if( strpos($liga[$i][0], 'Série A') != false ) {
+                if(cleaningGames($liga[$i][0])) {
                     $placarTime1 = explode(" ", $liga[$i][1])[0];
                     $placarTime2 = explode(" ", $liga[$i][2])[0];
                     $time1 =isset($liga[$i][1])?explode(" ", $liga[$i][1]):'';
