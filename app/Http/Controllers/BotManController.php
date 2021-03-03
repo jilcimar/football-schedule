@@ -13,6 +13,7 @@ use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\BotMan\Users\User;
 use BotMan\Drivers\Telegram\TelegramDriver;
+use function Psy\debug;
 
 
 class BotManController extends Controller
@@ -27,7 +28,7 @@ class BotManController extends Controller
     {
         $config = [
             "telegram" => [
-                "token" => '1253599841:AAGAkEoAaVrGfExEAOaVmU-p0XpZM0kRGoc',
+                "token" => env('TELEGRAM_BOT_TOKEN'),
             ]
         ];
 
@@ -60,7 +61,7 @@ class BotManController extends Controller
                 );
                 $bot->startConversation(new StartConversation);
             } catch (\Exception $e) {
-                //
+                logger()->debug($e);
             }
         });
 
@@ -80,7 +81,8 @@ class BotManController extends Controller
                 );
                 $bot->startConversation(new JogosDeHoje);
             } catch (\Exception $e) {
-                //
+                logger()->debug($e);
+
             }
         });
 
@@ -104,21 +106,12 @@ class BotManController extends Controller
                 );
                 $bot->startConversation(new JogosDeAmanha);
             } catch (\Exception $e) {
-                //
+                logger()->debug($e);
             }
         });
 
         $this->bot->hears('/jogosamanha@futebolnatv_bot', function (BotMan $bot) {
             $bot->startConversation(new JogosDeAmanha);
-        });
-
-        //CLASSIFICAÇÃO DO BRASILEIRÃO SÉRIE A
-        $this->bot->hears('/tabela', function (BotMan $bot) {
-            $bot->startConversation(new Tabela);
-        });
-
-        $this->bot->hears('/tabela@futebolnatv_bot', function (BotMan $bot) {
-            $bot->startConversation(new Tabela);
         });
 
         //PLACAR AO VIVO DOS JOGOS DA SÉRIE A
