@@ -115,10 +115,10 @@ class BotManController extends Controller
         });
 
         //PLACAR AO VIVO DOS JOGOS DA SÉRIE A
-        $this->bot->hears('/placaraovivo', function (BotMan $bot) {
+        $this->bot->hears('/placar', function (BotMan $bot) {
             $bot->startConversation(new PlacarAoVivo);
         });
-        $this->bot->hears('/placaraovivo@futebolnatv_bot', function (BotMan $bot) {
+        $this->bot->hears('/placar@futebolnatv_bot', function (BotMan $bot) {
             $bot->startConversation(new PlacarAoVivo);
         });
 

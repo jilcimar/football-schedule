@@ -6,6 +6,7 @@ use App\Models\Match;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use Carbon\Carbon;
 use Weidner\Goutte\GoutteFacade;
+use function Psy\debug;
 
 class PlacarAoVivo extends Conversation
 {
@@ -35,42 +36,77 @@ class PlacarAoVivo extends Conversation
                     return trim($td->text());
                 });
 
-                $time [$i] = $tr->filter('td')->filter('span')->each(function ($td) {
-                    return trim($td->text());
-                });
-
-                //Filtrando só série A
-                if( strpos($liga[$i][0], 'Série A') != false ) {
+                if( cleaningGames($liga[$i][0]) and isset($liga[$i][1]) and isset($liga[$i][2])
+                    and isset($liga[$i][4])) {
                     $placarTime1 = explode(" ", $liga[$i][1])[0];
                     $placarTime2 = explode(" ", $liga[$i][2])[0];
-                    $time1 =isset($liga[$i][1])?explode(" ", $liga[$i][1]):'';
-                    $time2 = isset($liga[$i][1])?explode(" ", $liga[$i][1]):'';
+                    $time1 =substr( $liga[$i][1],1);
+                    $time2 =substr($liga[$i][2], 1);
+                    $campeonato = $liga[$i][0];
+                    $canal = $liga[$i][4];
 
-                    $dados['time1'] = isset($time1[1])? $time1[1] : '';
-                    $dados['palcarTime1'] = isset($placarTime1)?(int)$placarTime1:'-';
-                    $dados['time2'] = isset($time2[2])? $time2[2] : '';
-                    $dados['palcarTime2'] = isset($placarTime2)?(int)$placarTime2:'-';
+                    $dados['liga'] = $campeonato;
+                    $dados['time1'] = $time1;
+                    $dados['palcarTime1'] = $placarTime1;
+                    $dados['time2'] =$time2;
+                    $dados['palcarTime2'] = $placarTime2;
                     $dados['hora'] = $horario[$i][0];
-                    $dados['tempo'] = isset($tempo[$i][0])?' - '.$tempo[$i][0]:'';
-                    $dados['canal'] = isset($liga[$i][4])? $liga[$i][4] : '';
+                    $dados['canal'] = $canal;
                     return $dados;
                 }
             });
+        try {
+            $jogos = array_chunk($dados, 15);
 
-        $dados =  array_filter($dados);
+            $date = Carbon::now()->format('d/m/Y');
+            $firstPart = "\xF0\x9F\x9A\xA9 RESULTADOS  DOS JOGOS DE HOJE - ".$date."\n";
 
-        $date = Carbon::now()->format('d/m/Y');
-        $firstPart = "\xF0\x9F\x9A\xA9	RESULTADOS AGORA - BRASILEIRÃO SÉRIE A - ".$date."\n";
+            foreach ($jogos[0] as $jogo) {
+                if(isset($jogo)) {
+                    $firstPart = $firstPart ."\n \xF0\x9F\x8F\x86 : " .  strtoupper($jogo['liga']) .
+                        "\n \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+                        $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
+                        . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                        . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                        ."-------------------------------------------------------";
+                }
+            }
 
-        foreach ($dados as $jogo) {
-            $firstPart = $firstPart. "\n \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
-                    $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
-                . " \xF0\x9F\x95\xA7 : ". $jogo['hora'].$jogo['tempo']."\n"
-                . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
-                ."-------------------------------------------------------";
+            $this->say($firstPart);
+
+            if(isset($jogos[1])) {
+                $secondPart ='';
+                foreach ($jogos[1] as $jogo) {
+                    if(isset($jogo)) {
+                        $secondPart = $secondPart ."\n \xF0\x9F\x8F\x86 : " .  strtoupper($jogo['liga']) .
+                            "\n \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+                            $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
+                            . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                            . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                            ."-------------------------------------------------------";
+                    }
+                }
+                $this->say($secondPart);
+            }
+
+            if(isset($jogos[2])) {
+                $thirdPart ='';
+                foreach ($jogos[2] as $jogo) {
+                    if(isset($jogo)) {
+                        $thirdPart = $thirdPart ."\n \xF0\x9F\x8F\x86 : " .  strtoupper($jogo['liga']) .
+                            "\n \xE2\x9A\xBD : ". $jogo['time1'] .' '. $jogo['palcarTime1']." x ".
+                            $jogo['palcarTime2'].' '.$jogo['time2'] ."\n"
+                            . " \xF0\x9F\x95\xA7 : ". $jogo['hora']."\n"
+                            . " \xF0\x9F\x93\xBA : " . $jogo['canal']. "\n"
+                            ."-------------------------------------------------------";
+                    }
+                }
+                $this->say($thirdPart);
+            }
+
+        } catch (\Exception $exception) {
+            logger()->debug($exception);
         }
-
-        $this->say($firstPart);
 
         return true;
     }
