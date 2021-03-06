@@ -79,7 +79,7 @@ class ResultCron extends Command
             $jogos = array_chunk($dados, 15);
 
             $date = Carbon::now()->format('d/m/Y');
-            $firstPart = "\xF0\x9F\x9A\xA9 RESULTADOS  DOS JOGOS DE HOJE - ".$date."\n" .
+            $firstPart = "\xF0\x9F\x9A\xA9 RESUMO DOS JOGOS DE HOJE - ".$date."\n" .
                 "(VERSÃO BETA)\n";
 
             foreach ($jogos[0] as $jogo) {
