@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\TelegramCron::class,
+        Commands\ResultCron::class,
     ];
 
     /**
@@ -26,6 +27,7 @@ class Kernel extends ConsoleKernel
     {
 //         $schedule->command('demo:cron')->everyMinute();
          $schedule->command('scraping:cron')->dailyAt('08:00');
+         $schedule->command('result:cron')->dailyAt('08:00');
     }
 
     /**
