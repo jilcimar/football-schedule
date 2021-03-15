@@ -6,14 +6,12 @@ use App\Conversation\JogosDeAmanha;
 use App\Conversation\JogosDeHoje;
 use App\Conversation\PlacarAoVivo;
 use App\Conversation\StartConversation;
-use App\Conversation\Tabela;
 use App\Models\Subscriber;
 use BotMan\BotMan\BotMan;
 use BotMan\BotMan\BotManFactory;
 use BotMan\BotMan\Drivers\DriverManager;
 use BotMan\BotMan\Users\User;
 use BotMan\Drivers\Telegram\TelegramDriver;
-use function Psy\debug;
 
 
 class BotManController extends Controller
