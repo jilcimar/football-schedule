@@ -38,7 +38,7 @@ if (!function_exists('sendMessage')) {
                 'text' => $text
             ]);
         } else {
-            $subscribers = Subscriber::all();
+            $subscribers = Subscriber::where('daily_notification', true)->get();
 
             foreach ($subscribers as $subscriber) {
                 try {

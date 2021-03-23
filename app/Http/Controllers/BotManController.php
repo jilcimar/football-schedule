@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Conversation\AllowDailyNotifications;
+use App\Conversation\DenyDailyNotifications;
 use App\Conversation\JogosDeAmanha;
 use App\Conversation\JogosDeHoje;
 use App\Conversation\PlacarAoVivo;
@@ -118,6 +120,48 @@ class BotManController extends Controller
         });
         $this->bot->hears('/placar@futebolnatv_bot', function (BotMan $bot) {
             $bot->startConversation(new PlacarAoVivo);
+        });
+
+        //NOTIFICAÇÕES
+        $this->bot->hears('/ativarnotificacoes', function (BotMan $bot) {
+            try {
+                $user = $this->bot->getUser();
+                Subscriber::updateOrCreate(
+                    [
+                        'chat_id' => $user->getId(),
+                    ],
+                    [
+                        'chat_id' =>  $user->getId(),
+                        'username' =>$user->getUsername(),
+                        'first_name' => $user->getFirstName(),
+                        'daily_notification' => true,
+                    ]
+                );
+                $bot->startConversation(new AllowDailyNotifications);
+            } catch (\Exception $e) {
+                logger()->debug($e);
+            }
+        });
+
+        //DESATIVAR NOTIFICAÇÕES
+        $this->bot->hears('/desativarnotificacoes', function (BotMan $bot) {
+            try {
+                $user = $this->bot->getUser();
+                Subscriber::updateOrCreate(
+                    [
+                        'chat_id' => $user->getId(),
+                    ],
+                    [
+                        'chat_id' =>  $user->getId(),
+                        'username' =>$user->getUsername(),
+                        'first_name' => $user->getFirstName(),
+                        'daily_notification' => false,
+                    ]
+                );
+                $bot->startConversation(new DenyDailyNotifications);
+            } catch (\Exception $e) {
+                logger()->debug($e);
+            }
         });
 
         $this->bot->listen();
