@@ -57,8 +57,6 @@ class SubscriberController extends Controller
                             'text' => $text
                         ]);
                     } catch (\Exception $exception) {
-                        $subscriberBlock = Subscriber::where('chat_id',$subscriber->chat_id)->first();
-                        $subscriberBlock->delete();
                         \Log::info("Erro CHAT: ". $subscriber->chat_id);
                     }
                 }
@@ -67,7 +65,7 @@ class SubscriberController extends Controller
             return redirect()->back()->with('success', 'Aviso enviado!');
         }
 
-        $chatId = env('MODE_TEST')?env('CHAT_TEST','375323134'):$request->type;
+        $chatId = env('MODE_TEST')?env('CHAT_TEST'):$request->type;
         Telegram::sendMessage([
             'chat_id' => $chatId,
             'parse_mode' => 'HTML',
