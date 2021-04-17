@@ -37,7 +37,7 @@
                 <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-ban"></i></span>
                 <div class="info-box-content">
                     <span class="info-box-text">Avisos Automático Desabilitado</span>
-                    <span class="info-box-number">{{$countUsers-$countUsers}}</span>
+                    <span class="info-box-number">{{$usersNotificationOff}}</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
