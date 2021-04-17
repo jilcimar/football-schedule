@@ -12,8 +12,8 @@
             <div class="info-box mb-3">
                 <span class="info-box-icon bg-success elevation-1"><i class="fas fa-user-plus"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Usuários Ativos</span>
-                    <span class="info-box-number">{{$usersActive}}</span>
+                    <span class="info-box-text">Total de Usuários</span>
+                    <span class="info-box-number">{{$countUsers}}</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -22,10 +22,10 @@
         <!-- /.col -->
         <div class="col-12 col-sm-6 col-md-3">
             <div class="info-box mb-3">
-                <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-users"></i></span>
+                <span class="info-box-icon bg-gradient-blue elevation-1"><i class="fas fa-check"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Usuários</span>
-                    <span class="info-box-number">{{$usersAll}}</span>
+                    <span class="info-box-text">Avisos Automático Ativo</span>
+                    <span class="info-box-number">{{$countUsers}}</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -36,8 +36,8 @@
             <div class="info-box mb-3">
                 <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-ban"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text">Usuários Perdidos</span>
-                    <span class="info-box-number">{{$usersAll-$usersActive}}</span>
+                    <span class="info-box-text">Avisos Automático Desabilitado</span>
+                    <span class="info-box-number">{{$countUsers-$countUsers}}</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -64,10 +64,10 @@
         <div class="col-12 col-sm-6 col-md-6">
             <div class="card card-danger">
                 <div class="card-header">
-                    <h3 class="card-title">Representação dos usuários</h3>
+                    <h3 class="card-title">Representação das notificações</h3>
                 </div>
                 <div class="card-body">
-                    <canvas id="chartUsersActive" width="400" height="400"></canvas>
+                    <canvas id="chartcountUsers" width="400" height="400"></canvas>
                 </div>
                 <!-- /.card-body -->
             </div>
@@ -90,18 +90,17 @@
 @section('js')
     <script>
         $(function () {
-            var usersActive = {!!$usersActive!!};
-            var usersAll = {!! $usersAll !!};
-            var usersDrop = {!!$usersAll-$usersActive!!};
+            let usersNotificationActive = {!!$usersNotificationActive!!};
+            let usersNotificationOff = {!! $usersNotificationOff !!};
 
-            var ctx = document.getElementById("chartUsersActive").getContext('2d');
-            var chartUsersActive = new Chart(ctx, {
+            let ctx = document.getElementById("chartcountUsers").getContext('2d');
+            let chartcountUsers = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: ["Usuários Ativos", "Já usaram o bot", "Usuários Perdidos"],
+                    labels: ["Usuários com notificações Ativas", "Usuários com Notificações desabilitadas"],
                     datasets: [{
-                        backgroundColor: ["#3cba9f","#3e95cd", "#ef1624"],
-                        data: [usersActive,usersAll,usersDrop]
+                        backgroundColor: ["#3cba9f","#3e95cd"],
+                        data: [usersNotificationActive,usersNotificationOff]
                     }]
                 },
                 options: {
@@ -110,23 +109,23 @@
                 }
             });
 
-            var labelMeses = {!! json_encode($labelMeses) !!}
-            var dadosMeses = {!! json_encode($dadosMeses) !!}
-            console.log(labelMeses);
-            var cty = document.getElementById("chartUsersMonth").getContext('2d');
-            var chartUsersMonth = new Chart(cty, {
+            let labelMonths = {!! json_encode($labelMonths) !!}
+            let dataMonths = {!! json_encode($dataMonths) !!}
+            console.log(labelMonths);
+            let cty = document.getElementById("chartUsersMonth").getContext('2d');
+            let chartUsersMonth = new Chart(cty, {
                 type: 'bar',
                 data: {
-                    labels: labelMeses,
+                    labels: labelMonths,
                     datasets: [
                         {
-                            label: "Agrupamento de inscritos ativos por mês",
+                            label: "Agrupamento de inscritos por mês",
                             backgroundColor: [
                                 "#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9",
                                 "#c45850","#3e95cd", "#8e5ea2","#3cba9f",
                                 "#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9",
                             ],
-                            data: dadosMeses
+                            data: dataMonths
                         },
                     ]
                 },

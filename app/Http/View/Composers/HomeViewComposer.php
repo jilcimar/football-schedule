@@ -15,26 +15,30 @@ class HomeViewComposer
      */
     public function compose(View $view)
     {
-        $usersActive = Subscriber::all()->count();
-        $usersAll = Subscriber::onlyTrashed()->count() + $usersActive;
+        $countUsers = Subscriber::onlyTrashed()->count() + Subscriber::all()->count();
+        $usersNotificationActive = Subscriber::where('daily_notification', true)->count();
+        $usersNotificationOff = Subscriber::where('daily_notification', false)->count();
 
-        $labelMeses = [];
-        $dadosMeses = [];
+        $labelMonths = [];
+        $dataMonths = [];
 
         $groupByMonth = Subscriber::select('id', 'created_at')
+            ->withTrashed()
             ->get()
             ->groupBy(function($date) {
                 return Carbon::parse($date->created_at)->format('m');
             });
 
         foreach ($groupByMonth as $key=> $data) {
-            $labelMeses[] = date("F", mktime(null, null, null, $key, 1));
-            $dadosMeses[] = count($data);
+
+            $labelMonths[] = date("F", mktime(null, null, null, $key, 1));
+            $dataMonths[] = count($data);
         }
 
-        $view->with('usersActive');
-        $view->with('usersAll');
-        $view->with('labelMeses');
-        $view->with('dadosMeses');
+        $view->with('usersNotificationActive', $usersNotificationActive);
+        $view->with('usersNotificationOff', $usersNotificationOff);
+        $view->with('countUsers', $countUsers);
+        $view->with('labelMonths', $labelMonths);
+        $view->with('dataMonths', $dataMonths);
     }
 }

@@ -19,20 +19,8 @@ class ViewServiceProvider extends ServiceProvider
         $this->registerComposers();
     }
 
-    /**
-     * Register services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        $this->loadViewsFrom(app()->resourcePath('views/pages'), 'pages');
-    }
-
     public function registerComposers()
     {
-        View::composer([
-            'home',
-        ], HomeViewComposer::class);
+        View::composer('home', HomeViewComposer::class);
     }
 }
