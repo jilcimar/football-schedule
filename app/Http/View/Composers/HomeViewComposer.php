@@ -26,12 +26,11 @@ class HomeViewComposer
             ->withTrashed()
             ->get()
             ->groupBy(function($date) {
-                return Carbon::parse($date->created_at)->format('m');
+                return Carbon::parse($date->created_at)->format('m/Y');
             });
 
         foreach ($groupByMonth as $key=> $data) {
-
-            $labelMonths[] = date("F", mktime(null, null, null, $key, 1));
+            $labelMonths[] = $key;
             $dataMonths[] = count($data);
         }
 
