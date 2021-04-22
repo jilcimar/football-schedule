@@ -15,7 +15,7 @@ class HomeViewComposer
      */
     public function compose(View $view)
     {
-        $countUsers = Subscriber::onlyTrashed()->count() + Subscriber::all()->count();
+        $countUsers = Subscriber::all()->count();
         $usersNotificationActive = Subscriber::where('daily_notification', true)->count();
         $usersNotificationOff = Subscriber::where('daily_notification', false)->count();
 
